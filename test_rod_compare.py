@@ -4,6 +4,7 @@ from rod_compare import (
     WikiTableParser,
     choose_rod_tables,
     extract_passive_from_rod_page,
+    extract_passive_from_raw_wikitext,
     enrich_rod_details_online,
     fetch_rod_page_details,
     load_rods_from_local_html,
@@ -34,6 +35,7 @@ SAMPLE_HTML = """
 def test_parse_number():
     assert parse_number("70%") == 70.0
     assert parse_number("C$50,000") == 50000.0
+    assert parse_number("Infinite") == float("inf")
     assert parse_number("-") is None
 
 
@@ -167,3 +169,41 @@ def test_fetch_rod_page_details_extracts_many_fields(monkeypatch):
     assert details["price"] == "15,000C$"
     assert details["stage"] == "Stage 3"
     assert details["durability"].startswith("200")
+
+
+def test_extract_passive_from_raw_wikitext():
+    raw = """
+    | passive = 50% chance for Brined (3.5×)
+    | stage = Stage 3
+    """
+    assert extract_passive_from_raw_wikitext(raw) == "50% chance for Brined (3.5×)"
+
+
+def test_fetch_rod_page_details_uses_raw_passive_fallback(monkeypatch):
+    html_without_passive = "<table><tr><th>Location</th><td>Brine Pool</td></tr></table>"
+    raw_with_passive = "| passive = Brined (3.5×)"
+
+    class DummyResponse:
+        def __init__(self, payload: str):
+            self.payload = payload
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def read(self):
+            return self.payload.encode("utf-8")
+
+    calls = {"count": 0}
+
+    def fake_urlopen(*args, **kwargs):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            return DummyResponse(html_without_passive)
+        return DummyResponse(raw_with_passive)
+
+    monkeypatch.setattr("rod_compare.urlopen", fake_urlopen)
+    details = fetch_rod_page_details("Brine-Infused Rod", "https://fischipedia.org")
+    assert details["passive"] == "Brined (3.5×)"

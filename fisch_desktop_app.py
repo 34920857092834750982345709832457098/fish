@@ -130,7 +130,7 @@ class FischDesktopApp:
             self.tree.column(col, width=width, stretch=True, anchor="w")
         self.tree.pack(fill="both", expand=True)
         self.tree.bind("<Button-3>", self._on_tree_right_click)
-        self.tree.tag_configure("odd", background="black", foreground="white")
+        self.tree.tag_configure("odd", background="gray", foreground="white")
         self.tree.tag_configure("even", background="white", foreground="black")
         self.tree.tag_configure("limited_location", foreground="red")
 

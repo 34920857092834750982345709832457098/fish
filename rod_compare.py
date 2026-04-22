@@ -402,6 +402,20 @@ def extract_passive_from_rod_page(html: str) -> str | None:
     return None
 
 
+def extract_passive_from_raw_wikitext(raw_text: str) -> str | None:
+    patterns = [
+        r"(?im)^\s*\|\s*passive\s*=\s*(.+)$",
+        r"(?im)^\s*\|\s*passive effect\s*=\s*(.+)$",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, raw_text)
+        if match:
+            value = normalize_space(re.sub(r"\[\[|\]\]|''", "", match.group(1)))
+            if value and value != "-":
+                return value
+    return None
+
+
 def extract_rod_page_details(html: str) -> dict[str, str]:
     fields: dict[str, str] = {}
     matches = re.findall(
@@ -455,6 +469,16 @@ def fetch_rod_page_details(rod_name: str, wiki_base: str) -> dict[str, str]:
     details = normalize_rod_detail_fields(extract_rod_page_details(html))
     if "passive" not in details:
         passive = extract_passive_from_rod_page(html)
+        if passive:
+            details["passive"] = passive
+    if "passive" not in details:
+        raw_req = Request(f"{rod_url}?action=raw", headers={"User-Agent": "rod-compare-bot/1.0"})
+        try:
+            with urlopen(raw_req, timeout=30) as response:
+                raw_text = response.read().decode("utf-8", errors="replace")
+        except (HTTPError, URLError):
+            return details
+        passive = extract_passive_from_raw_wikitext(raw_text)
         if passive:
             details["passive"] = passive
     return details
