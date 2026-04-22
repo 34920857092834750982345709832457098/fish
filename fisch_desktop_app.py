@@ -32,6 +32,7 @@ DISPLAY_COLUMNS = [
     "line_distance",
     "passive",
     "location",
+    "passive",
     "source",
 ]
 
@@ -50,6 +51,7 @@ COLUMN_TITLES = {
     "line_distance": "Line Distance",
     "passive": "Passive",
     "location": "Location",
+    "passive": "Passive",
     "source": "Source",
 }
 
@@ -109,6 +111,7 @@ class FischDesktopApp:
         ttk.Label(search_row, text="Search:").pack(side="left")
         ttk.Entry(search_row, textvariable=self.search_var, width=40).pack(side="left", padx=8)
         ttk.Label(search_row, text="(name, location, source, passive)").pack(side="left")
+        ttk.Label(search_row, text="(name, source, passive)").pack(side="left")
 
         self.tree = ttk.Treeview(middle, columns=DISPLAY_COLUMNS, show="headings", height=16)
         for col in DISPLAY_COLUMNS:
@@ -191,6 +194,7 @@ class FischDesktopApp:
                 or q in (rod.get("disturbance") or "").lower()
                 or q in (rod.get("hunt_focus") or "").lower()
                 or q in (rod.get("line_distance") or "").lower()
+                or q in (rod.get("source") or "").lower()
                 or q in (rod.get("passive") or "").lower()
             ]
 

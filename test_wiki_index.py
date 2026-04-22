@@ -32,6 +32,7 @@ def test_refresh_index_uses_fetch_and_enrich(monkeypatch, tmp_path: Path):
 
     monkeypatch.setattr("wiki_index.fetch_rods", fake_fetch)
     monkeypatch.setattr("wiki_index.enrich_rod_details_online", fake_enrich)
+    monkeypatch.setattr("wiki_index.enrich_passives_online", fake_enrich)
 
     out = tmp_path / "idx.json"
     result = refresh_index("https://fischipedia.org/wiki/Fishing_Rods", str(out), scan_passives=True)
