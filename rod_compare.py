@@ -172,6 +172,23 @@ def parse_rods_from_wikitext(raw_text: str) -> list[Rod]:
     return rods
 
 
+    required = {"rod", "lure", "luck", "control", "resilience"}
+    for table in tables:
+        if not table:
+            continue
+        header_row = table[0]["cells"]
+        lowered = [h.lower() for h in header_row]
+        if required.issubset(" ".join(lowered).split()):
+            rows = [r["cells"] for r in table[1:] if r["cells"]]
+            return header_row, rows
+
+        joined_headers = " | ".join(lowered)
+        if all(k in joined_headers for k in required):
+            rows = [r["cells"] for r in table[1:] if r["cells"]]
+            return header_row, rows
+    return None
+
+
 def map_header_indices(headers: list[str]) -> dict[str, int]:
     key_map = {
         "name": [["rod"], ["name"]],
@@ -270,6 +287,7 @@ def fetch_rods(url: str) -> list[Rod]:
                 "Could not find a fishing-rod stats table in HTML and raw wiki fallback failed."
             ) from exc
         return parse_rods_from_wikitext(raw_text)
+    return parse_rods_from_html(html)
 
 
 def load_rods_from_local_html(path: str) -> list[Rod]:
