@@ -14,6 +14,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
+from rod_compare import Rod, enrich_rod_details_online, fetch_rods
 from rod_compare import Rod, enrich_passives_online, fetch_rods
 
 DEFAULT_INDEX_FILE = "rods_index.json"
@@ -45,6 +46,7 @@ def refresh_index(
 ) -> list[dict[str, Any]]:
     rods = fetch_rods(wiki_url)
     if scan_passives:
+        enrich_rod_details_online(rods, wiki_url)
         enrich_passives_online(rods, wiki_url)
     save_index(rods, output_path)
     return normalize_rods(rods)

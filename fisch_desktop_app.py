@@ -25,6 +25,13 @@ DISPLAY_COLUMNS = [
     "resilience",
     "max_kg",
     "price",
+    "stage",
+    "durability",
+    "disturbance",
+    "hunt_focus",
+    "line_distance",
+    "passive",
+    "location",
     "passive",
     "source",
 ]
@@ -37,6 +44,13 @@ COLUMN_TITLES = {
     "resilience": "Resilience",
     "max_kg": "Max Kg",
     "price": "Price",
+    "stage": "Stage",
+    "durability": "Durability",
+    "disturbance": "Disturbance",
+    "hunt_focus": "Hunt Focus",
+    "line_distance": "Line Distance",
+    "passive": "Passive",
+    "location": "Location",
     "passive": "Passive",
     "source": "Source",
 }
@@ -96,6 +110,7 @@ class FischDesktopApp:
         search_row.pack(fill="x", pady=(0, 8))
         ttk.Label(search_row, text="Search:").pack(side="left")
         ttk.Entry(search_row, textvariable=self.search_var, width=40).pack(side="left", padx=8)
+        ttk.Label(search_row, text="(name, location, source, passive)").pack(side="left")
         ttk.Label(search_row, text="(name, source, passive)").pack(side="left")
 
         self.tree = ttk.Treeview(middle, columns=DISPLAY_COLUMNS, show="headings", height=16)
@@ -106,6 +121,12 @@ class FischDesktopApp:
                 width = 180
             elif col == "passive":
                 width = 260
+            elif col == "location":
+                width = 180
+            elif col == "durability":
+                width = 200
+            elif col == "hunt_focus":
+                width = 200
             elif col == "source":
                 width = 180
             self.tree.column(col, width=width, stretch=True, anchor="w")
@@ -166,6 +187,13 @@ class FischDesktopApp:
                 rod
                 for rod in self.rods
                 if q in (rod.get("name") or "").lower()
+                or q in (rod.get("location") or "").lower()
+                or q in (rod.get("source") or "").lower()
+                or q in (rod.get("stage") or "").lower()
+                or q in (rod.get("durability") or "").lower()
+                or q in (rod.get("disturbance") or "").lower()
+                or q in (rod.get("hunt_focus") or "").lower()
+                or q in (rod.get("line_distance") or "").lower()
                 or q in (rod.get("source") or "").lower()
                 or q in (rod.get("passive") or "").lower()
             ]

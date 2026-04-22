@@ -26,12 +26,18 @@ DEFAULT_URL = "https://fischipedia.org/wiki/Fishing_Rods"
 class Rod:
     name: str
     source: str
+    location: str | None = None
+    stage: str | None = None
     lure_speed: float | None = None
     luck: float | None = None
     control: float | None = None
     resilience: float | None = None
     max_kg: float | None = None
     price: float | None = None
+    durability: str | None = None
+    disturbance: str | None = None
+    hunt_focus: str | None = None
+    line_distance: str | None = None
     passive: str | None = None
 
 
@@ -125,6 +131,9 @@ def parse_number(value: str) -> float | None:
     return float(match.group(0))
 
 
+def choose_rod_tables(tables: list[list[dict[str, list[str]]]]) -> list[tuple[list[str], list[list[str]]]]:
+    target_keywords = ["rod", "lure", "luck", "control", "resilience", "max", "price", "passive"]
+    matches: list[tuple[list[str], list[list[str]]]] = []
 def choose_rod_table(tables: list[list[dict[str, list[str]]]]) -> tuple[list[str], list[list[str]]] | None:
     target_keywords = ["rod", "lure", "luck", "control", "resilience", "max", "price", "passive"]
     for table in tables:
@@ -141,6 +150,9 @@ def choose_rod_table(tables: list[list[dict[str, list[str]]]]) -> tuple[list[str
 
             if has_rod and has_any_stat and score >= 4:
                 rows = [r["cells"] for r in table[row_index + 1 :] if r["cells"]]
+                matches.append((header_row, rows))
+                break
+    return matches
                 return header_row, rows
     return None
 
@@ -193,12 +205,18 @@ def map_header_indices(headers: list[str]) -> dict[str, int]:
     key_map = {
         "name": [["rod"], ["name"]],
         "source": [["source"], ["obtain"]],
+        "location": [["location"], ["loc"]],
+        "stage": [["stage"]],
         "lure_speed": [["lure"]],
         "luck": [["luck"]],
         "control": [["control"]],
         "resilience": [["resilience"]],
         "max_kg": [["max", "kg"]],
         "price": [["price"], ["cost"], ["c$"], ["$"]],
+        "durability": [["durability"]],
+        "disturbance": [["disturbance"]],
+        "hunt_focus": [["hunt", "focus"]],
+        "line_distance": [["line", "distance"]],
         "passive": [["passive"]],
     }
     indices: dict[str, int] = {}
@@ -228,6 +246,17 @@ def row_to_rod(row: list[str], idx: dict[str, int]) -> Rod | None:
     if not name:
         return None
 
+    source_text, location_text, price_value = split_source_location_price(
+        get("source"),
+        get("location"),
+        parse_number(get("price")),
+    )
+
+    return Rod(
+        name=name,
+        source=source_text,
+        location=location_text,
+        stage=get("stage") or None,
     return Rod(
         name=name,
         source=get("source"),
@@ -236,15 +265,60 @@ def row_to_rod(row: list[str], idx: dict[str, int]) -> Rod | None:
         control=parse_number(get("control")),
         resilience=parse_number(get("resilience")),
         max_kg=parse_number(get("max_kg")),
+        price=price_value,
+        durability=get("durability") or None,
+        disturbance=get("disturbance") or None,
+        hunt_focus=get("hunt_focus") or None,
+        line_distance=get("line_distance") or None,
         price=parse_number(get("price")),
         passive=get("passive") or None,
     )
+
+
+def split_source_location_price(
+    source_text: str,
+    location_text: str,
+    price_value: float | None,
+) -> tuple[str, str | None, float | None]:
+    source_clean = source_text.strip()
+    location_clean = location_text.strip() or None
+    price_clean = price_value
+
+    if price_clean is None and source_clean:
+        if "c$" in source_clean.lower() or "$" in source_clean:
+            parsed = parse_number(source_clean)
+            if parsed is not None:
+                price_clean = parsed
+                source_clean = re.sub(r"(?i)c?\$\s*[0-9,]+(?:\.[0-9]+)?", "", source_clean).strip(" -|/")
+
+    if not location_clean and " - " in source_clean:
+        left, right = source_clean.split(" - ", 1)
+        left_l = left.lower()
+        location_hints = ("island", "swamp", "sea", "pond", "river", "ocean", "cave", "bay", "desert", "forest")
+        if any(hint in left_l for hint in location_hints):
+            location_clean = left.strip()
+            source_clean = right.strip()
+
+    return source_clean, location_clean, price_clean
 
 
 def parse_rods_from_html(html: str) -> list[Rod]:
     parser = WikiTableParser()
     parser.feed(html)
 
+    selected = choose_rod_tables(parser.tables)
+    if not selected:
+        raise RuntimeError("Could not find a fishing-rod stats table on the page.")
+
+    rods: list[Rod] = []
+    seen_names: set[str] = set()
+    for headers, rows in selected:
+        indices = map_header_indices(headers)
+        for row in rows:
+            rod = row_to_rod(row, indices)
+            if rod and rod.name.lower() not in seen_names:
+                rods.append(rod)
+                seen_names.add(rod.name.lower())
     selected = choose_rod_table(parser.tables)
     if not selected:
         raise RuntimeError("Could not find a fishing-rod stats table on the page.")
@@ -330,6 +404,48 @@ def extract_passive_from_rod_page(html: str) -> str | None:
     return None
 
 
+def extract_rod_page_details(html: str) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    matches = re.findall(
+        r"<th[^>]*>\s*(.*?)\s*</th>\s*<td[^>]*>(.*?)</td>",
+        html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    for label_html, value_html in matches:
+        label = strip_tags(label_html).lower()
+        value = strip_tags(value_html)
+        if not label or not value:
+            continue
+        fields[label] = value
+    return fields
+
+
+def normalize_rod_detail_fields(fields: dict[str, str]) -> dict[str, str]:
+    mapped: dict[str, str] = {}
+    mapping = {
+        "location": "location",
+        "source": "source",
+        "price": "price",
+        "stage": "stage",
+        "lure speed": "lure_speed",
+        "luck": "luck",
+        "control": "control",
+        "resilience": "resilience",
+        "max kg": "max_kg",
+        "durability": "durability",
+        "disturbance": "disturbance",
+        "hunt focus": "hunt_focus",
+        "line distance": "line_distance",
+        "passive": "passive",
+    }
+    for label, value in fields.items():
+        key = mapping.get(label)
+        if key:
+            mapped[key] = value
+    return mapped
+
+
+def fetch_rod_page_details(rod_name: str, wiki_base: str) -> dict[str, str]:
 def fetch_rod_page_passive(rod_name: str, wiki_base: str) -> str | None:
     rod_url = f"{wiki_base}/wiki/{slugify_wiki_title(rod_name)}"
     req = Request(rod_url, headers={"User-Agent": "rod-compare-bot/1.0"})
@@ -337,6 +453,52 @@ def fetch_rod_page_passive(rod_name: str, wiki_base: str) -> str | None:
         with urlopen(req, timeout=30) as response:
             html = response.read().decode("utf-8", errors="replace")
     except (HTTPError, URLError):
+        return {}
+
+    details = normalize_rod_detail_fields(extract_rod_page_details(html))
+    if "passive" not in details:
+        passive = extract_passive_from_rod_page(html)
+        if passive:
+            details["passive"] = passive
+    return details
+
+
+def enrich_rod_details_online(rods: list[Rod], fishing_rods_url: str) -> None:
+    wiki_base = wiki_base_from_url(fishing_rods_url)
+    for rod in rods:
+        details = fetch_rod_page_details(rod.name, wiki_base)
+        if not details:
+            continue
+        if details.get("location"):
+            rod.location = details["location"]
+        if details.get("source"):
+            rod.source = details["source"]
+        if details.get("stage"):
+            rod.stage = details["stage"]
+        if details.get("lure_speed"):
+            rod.lure_speed = parse_number(details["lure_speed"])
+        if details.get("luck"):
+            rod.luck = parse_number(details["luck"])
+        if details.get("control"):
+            rod.control = parse_number(details["control"])
+        if details.get("resilience"):
+            rod.resilience = parse_number(details["resilience"])
+        if details.get("max_kg"):
+            rod.max_kg = parse_number(details["max_kg"])
+        if details.get("price"):
+            parsed_price = parse_number(details["price"])
+            if parsed_price is not None:
+                rod.price = parsed_price
+        if details.get("durability"):
+            rod.durability = details["durability"]
+        if details.get("disturbance"):
+            rod.disturbance = details["disturbance"]
+        if details.get("hunt_focus"):
+            rod.hunt_focus = details["hunt_focus"]
+        if details.get("line_distance"):
+            rod.line_distance = details["line_distance"]
+        if details.get("passive"):
+            rod.passive = details["passive"]
         return None
     return extract_passive_from_rod_page(html)
 
@@ -361,6 +523,23 @@ def compare_rows(rods: list[Rod], sort_by: str) -> list[Rod]:
 
 
 def print_table(rods: list[Rod]) -> None:
+    headers = [
+        "Rod",
+        "Lure",
+        "Luck",
+        "Control",
+        "Resilience",
+        "MaxKg",
+        "Price",
+        "Stage",
+        "Durability",
+        "Disturbance",
+        "Hunt Focus",
+        "Line Distance",
+        "Passive",
+        "Location",
+        "Source",
+    ]
     headers = ["Rod", "Lure", "Luck", "Control", "Resilience", "MaxKg", "Price", "Passive", "Source"]
     rows = [
         [
@@ -371,6 +550,13 @@ def print_table(rods: list[Rod]) -> None:
             fmt(rod.resilience),
             fmt(rod.max_kg),
             fmt(rod.price),
+            rod.stage or "-",
+            rod.durability or "-",
+            rod.disturbance or "-",
+            rod.hunt_focus or "-",
+            rod.line_distance or "-",
+            rod.passive or "-",
+            rod.location or "-",
             rod.passive or "-",
             rod.source,
         ]
@@ -414,6 +600,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument(
         "--scan-passives",
         action="store_true",
+        help="Online mode only: fetch each rod's wiki page and enrich passive and detailed rod factors.",
         help="Online mode only: fetch each rod's wiki page and enrich/overwrite passive data.",
     )
     return parser.parse_args(argv)
@@ -436,6 +623,7 @@ def main(argv: list[str]) -> int:
         return 1
 
     if args.scan_passives:
+        enrich_rod_details_online(rods, args.url)
         enrich_passives_online(rods, args.url)
 
     rods = filter_rods(rods, args.rods)
