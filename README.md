@@ -82,5 +82,7 @@ python rod_compare.py --input-html Fishing_Rods.html --top 10 --sort luck
 - If network access to the site is blocked, save the page as HTML in your browser and pass the file via `--input-html`.
 - `--scan-passives` is online-only and cannot be combined with `--input-html`.
 - Source, location, and price are parsed into separate fields/columns when possible, and missing factors display as `-`.
+- If network access to the site is blocked, save the page as HTML in your browser and pass the file via `--input-html`.
+- `--scan-passives` is online-only and cannot be combined with `--input-html`.
 - If the page structure changes, header matching may need updates in `rod_compare.py`.
 - Desktop index data is saved to `rods_index.json` by default.
