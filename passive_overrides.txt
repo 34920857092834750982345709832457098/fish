@@ -1,0 +1,1758 @@
+Abyssal Specter Rod
+
+Passive
+
++20% weight buff to all fish caught
+25% chance for Abyssal (5.5×)
+
+Adventurer's Rod
+
+Passive
+
++5% natural Mutation chance
+
+Anchor n' Chain
+
+Passive
+
+-10% Progress Speed
+10% chance for Rusty (0.7×)
+Every catch, the player gains 2 different fish from the current pool
+
+Antler Rod
+
+Passive
+
+25% chance for Jolly (2.2×)
+
+Apollo's Sunshot
+
+Passive
+
+While fishing, there will be a visible "Charge Meter" above the fishing bar:
+• Holding an input will cause the Charge Meter to accumulate Charge
+• During Day:
+▪︎ Charge accumulates at 1.5× speed
+▪︎ Charge accumulates passively
+• During Night:
+▪︎ Charge accumulates at 0.5× speed
+• When the Charge Meter reaches 100%, gain +9% progress and a 40% chance to apply Sunlit (6.8×)
+TBA
+
+Arctic Rod
+
+Passive
+
+All fish caught are Frozen (1.5×)
+
+Astraeus Serenade
+
+Passive
+
++50% Progress Speed
+10% chance to fill the progress bar instantly
+-10% Fish Weight
+15% chance for Astraeus (9.6×)
+10% chance for Serene (8.5×)
+8% chance for Celestial (4×)
+8% chance for Breezed (8.6×)
+8% chance for Nova (6×)
+Every 2.25-10 seconds a Flurry of Stars will ensue over 2.25 seconds:
+• Stars will begin falling every 0.5 seconds, gradually speeding up to 0.1 seconds per Star
+• Each Star grants +3% Progress
+• 10 Stars will fall in total, granting +30% Progress
+
+During Starfall:
+• 3 additional Stars will fall during the Flurry of Stars passive, granting +9% Progress
+
+Astral Rod
+
+Passive
+
+5% chance for Lunar (2.5×)
+
+Astralhook Rod
+
+Passive
+
++15% Progress Speed
+Every 2-4 seconds Stars fall increasing progress by 15%
+Every 12 catches spawns pool which lasts 44 seconds and applies Astral (3×) at a 63% chance to all players
+Perfect casts followed by perfect catches grant a 10% chance to catch any Fish and apply Stardust (4×), with the exception of Limited, Special and Divine Secret fish.
+
+Auric Rod
+
+Passive
+
+All fish caught will be one of following, with an equal 20% chance for each:
+Aurous (1.5×)
+Aurelian (2×)
+Aureate (2.5×)
+Aurulent (3×)
+Aureolin (3.5×) 
+
+Aurora Rod
+
+Passive
+
+15% chance for Aurora (6.5×)
+30% chance for Aurora during Aurora Borealis
+
+Avalanche Rod
+
+Passive
+
+25% chance for Sleet (2.4×)
+
+Axe of Rhoads
+
+Passive
+
+40% chance for Heavenly (6×)
+10% chance for Blessed (8.5×)
+5% chance for Chaotic (6.2×)
+5% chance for Shiny (1.85×)
+5% chance for Sparkling (1.85×)
+
+Azure Of Lagoon
+
+Passive
+
+25% chance per fish movement to stab for +6% progress, stunning the fish for 0.35 seconds
+100% chance for Glossy (1.6×)
+
+Bat Whisperer Rod
+
+Passive
+
++10% Progress Speed
+1 Bat is always present
++1 Bat during Night
++1 Bat for 15 seconds after a catch
+For each Bat, receive a Batty (2.5×) random fish from the last pool the player fished in every 30 seconds
+
+Bellona's Waraxe
+
+Passive
+
+20% chance for Bellona's Fury (7×)
+30% chance per fish movement to stab for +10% progress, stunning the fish for 0.35 seconds
+
+Each cast hooks 2 fish, triggering two simultaneous fishing minigames controlled by:
+• Left Click and Right Click for PC
+• LT and RT for Console
+• Clicking on the Left and Right side of the screen for Mobile
+
+Blade Of Glorp
+
+Passive
+
+23% chance for Gleebous (8×)
+Every 2 seconds, there is a 20% chance for a laser to strike after 2 warning pulses
+After the laser strikes:
+• -66% Control for 0.3 seconds
+(Reduces Control to 1/3 of it's current value)
+• Sets Progress Gain/Loss rate to 0.25% per frame, decaying over 2.5 seconds
+• If the fish has not left the bar during the 0.3 seconds duration, gains +10% Progress
+
+Blazebringer Rod
+
+Passive
+
+After 4 perfect catches for 2 minutes receive:
+• 20% chance for Ember (3×)
+• 5% chance for Cracked (3×)
+• +10% Luck
+After 8 additional for 3 minutes receive:
+• 25% chance for Ember (3×)
+• 10% chance for Cracked (3×)
+• 5% chance for Emberflame (5×)
+• +25% Luck
+
+Bloomspire
+
+Passive
+
+The player may unlock unique Bloomspire Variants
+Once unlocked, any variant of Bloomspire may be cycled through freely
+
+Bloomspire: Blooming Splendor
+
+Passive
+
+50% chance for Vitalic (8×)
++25% Fish Weight
+10% chance to stab every 2 seconds for +1.5% progress, chance increases by 1% every second. +1 stab every time a stab is triggered.
+
+Bloomspire: Slumbering Elegance
+
+Passive
+
++25% Progress Speed
+85% chance for Dreaming (3.5×)
+15% chance for Bliss (7×)
+Every 4 seconds, slashes the fish and grants +10% of progress, stunning the fish for 2 seconds
+
+Bloomspire: Twisted Toxins
+
+Passive
+
+-20% Fish Weight
+10% chance for Poisoned (0.9×)
+40% chance for Tainted (6.5×)
+When the fish is inside the fishing bar:
+• 25% chance per fish movement to Stab for +10% Progress, stunning the fish for 1 second
+
+When the fish is Stabbed by Any Stab passive ability:
+• Gain Progress Speed equal to 90% of the Stab Progress
+• Gain Forced Progress Speed equal to 10% of the Stab Progress
+• When the fish is outside the fishing bar:
+   ▪︎ Progress Speed gained from the passive rapidly decays
+
+Bone Blade
+
+Passive
+
+30% chance per fish movement to stab for +4% progress, stunning the fish for 0.35 seconds
+
+Boreal Rod
+
+Passive
+
+30% chance for Boreal (4×)
+
+Brick Built Rod
+
+Passive
+
+10% chance for Awesome (3×)
+
+Brick Rod
+
+Passive
+
+100% chance for Studded (1.8×)
+
+Brine-Infused Rod
+
+Passive
+
+50% chance for Brined (3.5×)
+
+Brother's Rod
+
+Passive
+
+20% chance to duplicate fish with Brother (3×)
+
+Buddy Bond Rod
+
+Passive
+
+Adds 30% to all stats when playing with a friend
+
+Bunnybloom Caster
+
+Passive
+
+25% chance for Bunny (4.5×)
++50% Progress Speed
+
+During Spring:
+50% chance for Bunny (4.5×)
++75% Progress Speed
+
+Candy Cane Rod
+
+Passive
+
+10% chance for Festive (2.4×)
+
+Carrot Rod
+
+Passive
+
+15% chance for Carrot (5×)
+10% chance to create a Carrot Pool which lasts 30 seconds and offers 15% for Carrot Mutation for all players nearby.
+
+Celestial Rod
+
+Passive
+
+For 2 minutes after 15 fish are caught:
+• +60% Lure Speed
+• +100% Luck
+• 100% chance for Celestial (4×)
+• +50% XP
+
+Cerebra
+
+Passive
+
+Grants +20% Progress at the start of the minigame
+30% chance per fish movement to stab for 6% Progress, stunning the fish for 0.35 seconds
+10% Chance for Heartburst (8×)
++22% Fish Weight
++22% Progress Speed
+
+Cerulean Fang Rod
+
+Passive
+
+15% for Nova (6×)
+40% chance per fish movement to stab for 8% progress, stunning the fish for 0.35 seconds
++15% Progress Speed
+
+Challenger's Rod
+
+Passive
+
++25% Progress Speed
+
+Christmas Tree Rod
+
+Passive
+
+25% chance for Merry (5×)
+
+Chrysalis
+
+Passive
+
++10% Progress Speed
+92% chance for Bloom (4×)
+8% chance for Flora (7×)
+12% chance for an eye to spawn and catch an additional fish with:
+• 100% chance for Flora (7×)
+• +20% chance for Shiny (1.85×)
+• +20% chance for Sparkling (1.85×)
+
+Cinder Block Rod
+
+Passive
+
+70% chance for Cement (1.5×)
+Always sets Progress Speed to -85% (Hidden)
+
+Cinderstring
+
+Passive
+
++10% Progress Speed
+After 2 Perfect Catches for 30 seconds receive:
+20% chance for Scorched (3×)
+5% chance for Infernal (7×)
++25% Progress Speed
++10% Luck
+-20% Resilience
+-0.05 Control
+After 2 additional Perfect Catches for 1 minute receive:
++100% Progress Speed
+15% chance for Infernal (7×)
+50% chance for Scorched (3×)
++25% Luck
+-40% Resilience
+-0.15 Control
+
+Clickbait Caster
+
+Passive
+
+Every 3 catches gain another fish
+
+Clover Rod
+
+Passive
+
++10% Progress Speed
+1% chance for Clover (4.5×)
+
+Coral Rod
+
+Passive
+
++10% Progress Speed
+50% chance for Coral (1.8×)
+
+Cornucopia Rod
+
+Passive
+
+10% chance for Gravy (6×)
+Drops a random piece of food on the fish every 2-3s, each giving +10% progress
+
+Crystalized Rod
+
+Passive
+
+20% chance for Crystalized (3.5×)
+
+Cupid's Bow
+
+Passive
+
+60% chance for Lovestruck (4×)
+10% chance for Heartburst (8×)
+20% chance to duplicate fish caught
++30% Progress Speed
+While fishing, there will be a visible "Charge Meter" above the fishing bar:
+• Holding an input will cause the Charge Meter to accumulate Charge at a random rate
+• The Charge will start decreasing if it reaches 100% of the Charge Meter
+• Returning to 0% Charge will restart the process
+• Releasing the input will cause the Charge Meter to reset
+If the input is released while Charge is over 80% of the Charge Meter and the fish is inside the fishing bar, the player gains +7% Progress
+
+Cupid's Embrace
+
+Passive
+
+25% chance for Embraced (9.1×)
+Every 1 second:
+• Lose 2% Progress Speed until 0%
+• Gain 1.4% Resilience
+
+When near another Cupid's Embrace:
+• +25% Progress Speed
+• +15% chance for Embraced (9.1×)
+
+Dave Rod
+
+Passive
+
+-51% Progress Speed.
+100% Rock Pool.
+100% chance to gift the fish caught to all players in the server
+
+Daybreaker Rod
+
+Passive
+
++15% Progress Speed
+25% chance for Solar (5.3×)
+• 50% during Day
+2× Stats and chance for Solar whilst fishing in an area with high temperature.
+
+Dead Man's Rod
+
+Passive
+
+When Progress is above 50%:
+• Tentacles will strike the fish granting +40% Progress
+• The ability goes on a 10 seconds cooldown
+50% chance to obtain one of five mutations:
+• Tentacle Surge (7.8×)
+• Sunken (6.3×)
+• Greedy (5×)
+• Wrath (4.5×)
+• Atlantean (4×)
+All five Mutations have equal chances.
+
+Decayed Rod
+
+Passive
+
+-5% Progress Speed
++40% Fish Weight
+50% chance for Decayed (0.45×)
+
+Demon-Slayer
+
+Passive
+
++50% Progress Speed
+
+Depthseeker Rod
+
+Passive
+
+25% for Darkened (1.5×)
++5% Progress Speed
+
+Destiny Rod
+
+Passive
+
++10% chance for Shiny (1.85×)
++10% chance for Sparkling (1.85×)
+
+Dreambreaker
+
+Passive
+
+After 20% progress, the borders of the player's screen reach a certain dimness, and the fishing minigame's input is inverted
++15% Progress Speed
+During Day:
+• -50% Fish Weight
+• 25% chance for Distraught (8.5×)
+During Night:
+• +50% Fish Weight
+• 35% chance for Distraught (8.5×)
+• Every 0.25 seconds 33% chance to Slash for 5% Progress, stunning the fish for 0.05 seconds
+• -15% Forced Progress Speed
+
+Dusekkar Rod
+
+Passive
+
++25% Progress Speed
+20% chance for Nightmare (8.8×)
+20% chance per fish movement to stab for +12% progress, stunning the fish for 0.35 seconds
+
+Duskwire
+
+Passive
+
++25% Progress Speed
+5% chance to grant +75% Progress at the start of the minigame
+Gain Progress Speed for Control past the -0.15 hard limit at a 1:150 ratio
+68% chance for Darkened (1.5×)
+30% chance for Chaotic (6.2×)
+2% chance for Serene (8.5×)
+After a Perfect Catch :
+97% chance for Chaotic (6.2×)
+3% chance for Serene (8.5×)
+
+Eardrum
+
+Passive
+
+Every 2 catches gives an additional fish with Oak (2.3×) from the current pool, with Log having a higher chance to be caught regardless of the pool the player is fishing in.
+
+Egg Rod
+
+Passive
+
+10% chance for Easter (4×)
+
+Eidolon Rod
+
+Passive
+
+35% chance for Phantom (4.5×)
++40% Progress Speed
+After reaching 70% Progress:
+• Sets Progress Speed to +666%
+• Sets Control to 0.7
+
+Elder Mossripper
+
+Passive
+
++45% Fish Weight
+20% chance for Shrouded (7×)
+5% chance for Mossy (8.7×)
+Every 2 minutes receive higher chance to catch a higher rarity fish with Mossy
++30% Progress Speed
+
+Electric Guitar
+
+Passive
+
+16.7% chance to grant +75% Progress at the start of the minigame
+
+Ethereal Prism Rod
+
+Passive
+
+50% chance for Prismize (5.5×)
+
+Event Horizon Rod
+
+Passive
+
+5% chance for Lunar (2.5×)
+
+Evil Pitchfork
+
+Passive
+
+50% chance to gain 500% of caught fish's base value, 30% to lose the same amount
+25% chance for 100-200% weight buff with Siren's Spite (5×)
+20% chance for Evil (6.5×)
+25% chance per fish movement to stab for +6% progress, stunning the fish for 0.35 seconds
++35% Progress Speed
+
+Fabulous Rod
+
+Passive
+
++25% Fish Weight.
+26% chance for Fabulous (9.6×)
+Every 0.25 seconds 25% chance to Slash for 3% progress.
+After 3 Slash gain the following:
+• +0.2 Control
+• +200% Forced Progress Speed.
+• Effects gradually diminishing over a span of 3 seconds.
+
+Fallen Rod
+
+Passive
+
+-25% Fish Weight
+When below a Y-Level of -400:
+• 50% chance for Fallen (6×)
+• +50% Fish Weight
+
+Fallen Snowblade
+
+Passive
+
+15% chance to grant +75% Progress at the start of the minigame
+During Winter:
+• +75% Progress Speed
+• 45% chance for Snowy (6×)
+• 55% chance for Frozen (1.5×)
+
+During Spring and Autumn:
+• +50% Progress Speed
+• 25% chance for Snowy (6×)
+• 75% chance for Frozen (1.5×)
+
+During Summer:
+• +25% Progress Speed
+• 5% chance for Snowy (6×)
+• 95% chance for Frozen (1.5×)
+
+Fang of the Eclipse
+
+Passive
+
+10% chance for Solarblaze (3×)
+
+Gains the following for 15-minutes after an Eclipse occurs:
+
+    +99 Lure (total 179 Lure)
+    +150 Luck (total 230 Luck)
+    -0.35 Control (total -0.2 Control)
+    -50 Resilience (total -30 Resilience)
+    Sets kg to inf
+    +50% progress speed
+    Grants a mutation with 10% chance for Umbra (9×), remaining 90% for Solarblaze (3×)
+    1.2× weight buff to all fish caught
+    20% to double-catch, 5% to triple-catch
+
+Firefly Rod
+
+Passive
+
+During Night:
+• +15% Progress Speed
+
+Firework Rod
+
+Passive
+
+15% chance for Firework (4×);
+When reeling an Eternal Frostwhale gains
++20% Progress Speed
++0.2% Eternal Frostwhale encounter rate
+
+Fish Photographer
+
+Passive
+
+Every 3 catches gain another fish
+
+Fixer's Rod
+
+Passive
+
+10% chance for Fixer (1.25×)
+
+Free Spirit Rod
+
+Passive
+
+25% chance per fish movement to stab for +6% progress, stunning the fish for 0.35 seconds
+30% chance for Bloom (4×)
+
+Friendly Rod
+
+Passive
+
+10% chance to catch a Friend Fish
+
+Frog Rod
+
+Passive
+
+Perfect catches streak gives +0.5× luck for 2 minutes up to 3 stacks.
+(Missing streak will instead remove one stack)
+
+Frostbane Rod
+
+Passive
+
+1% (3% during Winter) chance for Glacial (8×)
+10% (30% during Winter) chance for Chilled (6×)
+Infinite Max Kg during Winter
++20% Progress Speed during Winter or Night
++50% Progress Speed during Winter Night
+
+Fungal Rod
+
+Passive
+
+70% chance to give 45s of +50% Luck after a catch
+30% chance for Fungal (4×)
+
+Gardenkeeper Rod
+
+Passive
+
+25% chance for Floral (8.4×)
+
+Gingerbread Rod
+
+Passive
+
+25% chance for Gingerbread (5×)
+
+Great Dreamer Rod
+
+Passive
+
+Every 1-3 catches, gain another fish with a 50% chance for Cursed Touch (5×)
+
+Great Rod of Oscar
+
+Passive
+
++30% Progress Speed
+1.35× XP from fish
+5% chance for Oscar (6.4×)
+
+Hades' Soul-Scythe
+
+Passive
+
+20% chance for Soultouched (7.5×)
+Each catch affects Curse Meter by:
+• +3% per perfect cast
+• +5% per catch
+• +10% per perfect catch
+• -10% per reel snapped
+Once full:
+•100% chance for Hades' Curse (11.1×)
+• -50% Resilience
+• +50% Fish weight
+10% chance to grant +100% progress at the start of the minigame
+Every few seconds a flurry of 4-10 Wisps will swarm the fish over a period of 1.5 seconds:
+• Frequency of Wisps depends on Resilience, with higher Resilience resulting in more frequent attacks
+• Wisps will rapidly strike the fish, granting 4% progress per wisp during the Day, and 6% progress per wisp during Night
+
+Haunted Rod
+
+Passive
+
+10% chance for Sinister (2.9×)
+10% chance for Ghastly (3×)
+
+Heaven's Rod
+
+Passive
+
+35% chance for Heavenly (6×)
+
+Ice Warpers Rod
+
+Passive
+
+25% chance for Blighted (3×)
+
+Igneous Rupturer
+
+Passive
+
+30% chance for Igneous (8.65×)
++5% Progress Speed
+Spawns 4 rocks whilst fishing. Each rock grants +12% Progress on hit
+
+Jack-o-Blazer
+
+Passive
+
++15% Progress Speed
+20% chance for Wicked (6.6×)
+2% chance for Jack's Curse (8.5×)
+Every 1 second Jack-o-Lanterns fall, increasing Progress by +8%
+
+Jinglestar Rod
+
+Passive
+
+25% chance for Jingle Bell (8×)
++25% Progress Speed
+While fishing, there will be a visible Bell with a ring counter above it:
+• The ring counter always starts at 0
+• An input from the player will ring the Bell once, increasing the ring counter
+• The player must ring the Bell 10 times in a row with the correct timing
+
+If the player succeeds:
+• +20% Progress
+• The ability goes on a 2 second cooldown
+(If the player fails, the ring counter will reset to 0)
+
+Katana Rod
+
+Passive
+
+25% chance per fish movement to stab for +6% progress, stunning the fish for 0.35 seconds
+
+Kings Rod
+
+Passive
+
++30% Fish Weight
+
+Kraken Rod
+
+Passive
+
+After 5 fish caught receive random Legendary/Mythical/Exotic fish from bestiary collection
+20% chance to double fish on catch
+10% chance to double fish with Tentacle Surge (7.8×)
+
+Krampus's Rod
+
+Passive
+
+Every 10 catches, alternate between giving Luck X or Lure X for 10 minutes
+
+Leprechaun Line
+
+Passive
+
+10% chance for Lucky Gold (6.14×)
+While catching a Lucky Gold fish:
++1× Server Luck for 45 seconds (up to ×8)
+1% for Four Leaf Clover along with the fish
+0.1× Bait effectiveness
+-200% chance to save Bait
+
+Leviathan's Fang Rod
+
+Passive
+
+25% chance per fish movement to stab for +3% progress, stunning the fish for 0.35 seconds
+If catching Scylla gain
++50% resilience and fill up 4% of progress
+Bypasses Scylla Progress Speed lock
+
+Lobster Rod
+
+Passive
+
+30% Chance for Lobster (5×)
+
+Lucid Rod
+
+Passive
+
+20% chance for Lucid (3.5×) and to dupe fish caught.
++10% Progress Speed
+
+During Clear Weather:
+• Increases Lucid chance to 30% and provides an additional dupe.
+
+Luminescent Oath
+
+Passive
+
+5% chance for slashes, that fill up 2% progress and stun the fish for 0.1 seconds, every 0.25 seconds. Chances for slashes increase by 10% every second.
+15% chance for Luminescent (6.5×)
+15% chance to grant +20% Progress at the start of the minigame
+
+During Perfect Catch :
+The control bar gradually decreases in size, however the progress speed gradually increases by 2% every second.
+100% chance for Mastered (9×)
+
+Maelstrom
+
+Passive
+
+30% chance for Frostbitten (9×)
+-10% Progress Speed
+While fishing, there will be a visible "Charge Meter" above the fishing bar:
+• Holding an input will cause the Charge Meter to accumulate Charge at a random rate
+• The Charge will start decreasing if it reaches 100% of the Charge Meter
+• Returning to 0% Charge will restart the process
+• Releasing the input will cause the Charge Meter to reset
+If the input is released while Charge is over 80% of the Charge Meter and the fish is inside the fishing bar:
+• +15% Progress
+• 25% chance to freeze fish movement for 2-4 seconds
+(This freeze effect replaces any active freeze effect from enchantments.)
+
+Magma Rod
+
+Passive
+
+35% chance for Ember (3×)
+
+Magnet Rod
+
+Passive
+
+Multiplies non-Crate catch chance by 0.01% (near-guaranteeing Crates).
+
+Masterline Rod
+
+Passive
+
++50% Progress Speed
++25% Forced Progress Speed
+25% chance for Ascended (9.9×)
+10% chance for Blessed (8.5×)
++5% chance for Shiny (1.85×)
++5% chance for Sparkling (1.85×)
+
+Merchant Rod
+
+Passive
+
+50% chance to catch a random bait (excluding Limited Time Baits)
+
+Merlin's Staff
+
+Passive
+
+25% chance for Magical (7.2×)
+While the fish is inside the fishing bar:
+1. Control gradually decreases until it reaches -0.2
+2. Gains +30% Progress after Control reaches -0.2
+3. Control is reset to its original value, and the ability goes on a cooldown
+If the fish gets out of the bar before reaching -0.2 Control, the Control is reset to its original value
+The ability will restart after the fish is back inside the fishing bar
+
+Microphone Rod
+
+Passive
+
+10% chance for Amped (4×)
+
+Midas Rod
+
+Passive
+
+All fish caught are Midas (2.5×)
+
+MiguRod
+
+Passive
+
+Grants +31% progress at the start of the minigame
+40.1% for Supersonic (8.01×)
+1.41× chance for Rare Finds
+
+Every 3 catches, activates Mesmerizer:
+• Gain 2 different fish with:
+   ▪︎ 100% chance for Mesmerized (3.2×)
+   ▪︎ +14% chance for Shiny (1.85×)
+• 9% chance for Enchant Relic
+• 1% chance for Exalted Relic
+
+41% chance per fish movement, to activate Chimera's Wrath:
+• 3 Slashes appear on the minigame
+• +4% Progress per each successful dodge
+• Bar is cut in the place the hit is taken
+
+Mission Specialist's Rod
+
+Passive
+
+10% chance for Mission Specialist (1.25×)
+
+Mythical Rod
+
+Passive
+
+30% chance for Mythical (5.5×)
+
+Nates Blade
+
+Passive
+
+Control bar gradually increases in size whilst catching a fish
++100% weight buff to all fish caught
+100% chance to obtain one of the three mutations:
+• Lumpy (2×)
+• Rockstar (2×)
+• Bubblegum (2×)
+All three Mutations have equal chances
+25% chance per fish movement to stab for +6% progress, stunning the fish for 0.35 seconds
++50% Progress Speed
+
+Necrotic Rod
+
+Passive
+
++13% Progress Speed
+30% chance for Necrotic (7.4×)
+Every 2 seconds whilst reeling a fish:
+• Reduces Control by 10% of its current value
+• Increases Progress Speed by 10% of its current value, increased by 100%
+• Increases Resilience by 10%
+
+New Years Rod
+
+Passive
+
++26% Progress Speed
+15% Chance for New Years (2.6×) with +100% Progress Speed
+
+NilCaster
+
+Passive
+
+-+101.010101% Progress Speed boost
+50% chance to apply the Nuclear Mutation (6× Value)
+-Each cast randomizes a boost to stats (±80 Resilience, +0.4/-0.35 Control, ±100% Progress Speed boost, and -99%/+200% fish weight)
+
+No-Life Rod
+
+Passive
+
+25% chance per fish movement to stab for +6% progress, stunning the fish for 0.35 seconds
+50% chance for Hexed (3×)
+
+Noctone
+
+Passive
+
+40% chance for Glowy (8×)
+20% chance for Greedy (5×)
++7% chance for Shiny (1.85×)
++7% chance for Sparkling (1.85×)
+
+Nocturnal Rod
+
+Passive
+
+Removes time preference Luck penalty
+
+North Pole
+
+Passive
+
+25% chance for Permafrost (9.5×)
+24% chance per fish movement to stab for +12% progress, stunning the fish for 0.25 seconds
+While the fish is inside the fishing bar:
+• +10% Forced Progress Speed
+• +40% Progress Speed
+
+Olympian Godbreaker
+
+Passive
+
++35% Progress Speed
+30% chance for Cragged (7×)
+30% chance for Gravitas (9.81×)
+50% Chance every 1.25 Seconds to pull the fish towards the bar, granting +3% Progress if the fish is within the bar
+
+30% chance to trigger Starcaller Cry:
+• -0.15 Control
+• +5 Disturbance for the next 3 Catches
+• Summons Black Hole to grant 2 to 5 Fish of equal or lower Rarity:
+   ▪︎ 100% chance for Cragged (7×)
+   ▪︎ Failing Perfect Catch will cancel the Black Hole
+• If Gravitas fish is hooked while the passive is active, triggers Collapsing Gravity:
+   ▪︎ Multiply Final Fish Weight by 1.981×
+
+5% chance to summon Meteor Shower :
+• 12 Meteors will strike the fish, each granting +6% Progress
+• Chance increases by +5% every catch
+   ▪︎ The chances reset upon a successful summon
+
+When catching a Progress Locked Fish:
+• Sets Progress Speed to -75%
+• Enhanced Progress Boost Passive:
+   ▪︎ 50% Chance every 1.25 Seconds to pull the fish towards the bar, granting +3% Progress or +9% Progress if the fish is within the bar
+• Meteor Shower cannot be summoned
+
+Onirifalx
+
+Passive
+
+30% chance to grant +30% progress at the start of the minigame
++70% Progress Speed
++5% Progress Speed per perfect catch (+50% max)
+-0.01 Control per perfect catch (-0.1 max)
+50% chance for Levitas (5×)
+7% chance for Sacratus (7×)
+3% chance for Puritas (8.7×)
+
+Original No-Life Rod
+
+Passive
+
+20% chance for Hexed (3×)
+
+Paintbrush
+
+Passive
+
++314% Progress Speed
+50% chance to catch Mythical (5.5×)
+10% chance to catch Sparkling/Shiny
+
+Paleontologist's Rod
+
+Passive
+
+10% chance for Paleontologist (1.25×)
+
+Paper Fan Rod
+
+Passive
+
+70% chance per fish movement to stab for +1.5% progress, stunning the fish for 0.1 seconds
+
+Patriot Rod
+
+Passive
+
+20% Chance for Patriotic (7.4×) with +100% Progress Speed
+
+Pen Rod
+
+Passive
+
+52% chance per fish movement to stab for 2.5% progress, stunning the fish for 0.35 seconds
+52% chance for Glyphed (5.2×)
+
+Peppermint Rod
+
+Passive
+
+25% chance for Peppermint (5×)
+
+Phoenix Rod
+
+Passive
+
+40% chance for Scorched (3×)
+10% chance for Solarblaze (3×)
+
+Pinion's Aria
+
+Passive
+
+42% chance for Harmonized (4.2×)
++14.2% chance for Shiny (1.85×)
+Perfect Catches grants 2.42× XP
++10% Initial Progress at the start of the minigame
+Control boosts from External Sources are reduced by 50%
++100% Fishing Bar Movement Speed
+
+While fishing, Notes will start falling across the bar:
+• Notes will fall every 2 seconds, accelerating to every 1 second
+• When a Note is caught by the fishing bar:
+   ▪︎ +0.025 Control, up to +0.2
+   ▪︎ +3% Progress
+   ▪︎ +5% Progress Speed
+   ▪︎ -2.5% Progress Loss Speed
+   ▪︎ -10% Fish Movement Speed
+• When a Note is missed or a stab effect is triggered:
+   ▪︎ -15% Control
+   ▪︎ -10% Progress
+   ▪︎ -10% Progress Speed
+   ▪︎ +10% Progress Loss Speed
+   ▪︎ +50% Fish Movement Speed
+
+After catching 7 Notes in a row, enter Resonance state:
+• The Fish will follow the fishing bar
+• Temporarily disables Fish abilities
+• Every 1 second:
+   ▪︎ -0.075 Control, down to -0.2
+   ▪︎ +1% Forced Progress Speed
+• If a Note is missed, Resonance state ends
+   ▪︎ When Resonance ends, Control is reset
+
+Plaguereaver
+
+Passive
+
+Grants +40% progress at the start of the minigame
++75% Progress Speed
+15% chance for Plagued (10×)
+2% chance per fish movement to stab for +20% progress, stunning the fish for 5 seconds
+
+Polaris Serenade
+
+Passive
+
++30% Progress Speed
+4% chance to grant +75% Progress at the start of the minigame
+18% chance for Serene (8.5×)
+Every 72 seconds the player gains a fish with:
+• 100% chance for Quiet (3×)
+• +3% chance for Shiny (1.85×)
+• +3% chance for Sparkling (1.85×)
+Every perfect catch reduces the time by 24 seconds
+
+Popsicle Rod
+
+Passive
+
+15% chance for Popsicle (8.16×)
+During Summer:
+• +50% Progress Speed
+
+Poseidon Rod
+
+Passive
+
+25% chance to gain 75% of caught fish's base value;
+10% chance for 75-150% weight buff with King's Blessing (5.5×)
+
+Poseidon's Lance
+
+Passive
+
+20% for Tidal Surge (8.5×)
+Outside of Rain and Stormy:
+• Every 3-10 seconds, a massive wave of water crashes into the fish granting +22% Progress
+During Rain:
+• Every 2-6.6 seconds, a massive wave of water crashes into the fish granting +22% Progress
+During Stormy:
+• Every 1-3.3 seconds, a massive wave of water crashes into the fish granting +22% Progress
+Every 1 second the fish is inside the highlighted middle of the bar, there is a 35% chance to Impale the fish, stunning the fish for 3 seconds and granting +2% Progress.
+Can be turned into a Spear through the following:
+• Right Click for Desktop
+• Dedicated Button for Mobile
+• LT for Console
+
+Rainbow Cluster Rod
+
+Passive
+
+20% chance for Rainbow Cluster (5×)
+During Rainbow weather:
++50% Progress Speed
+35% chance for Rainbow Cluster (5×)
+
+Random Rod
+
+Passive
+
+50% chance for Jackpot (7.77×)
+50% chance for Unlucky (0.5×)
+50% chance to multiply Final Weight by 2×
+50% chance to multiply Final Weight by 0.5×
+
+Each cast randomizes a boost to stats:
+• -80% to +80% Resilience
+• -0.3 to +0.3 Control
+• -77% to +100% Progress Speed
+
+Requiem
+
+Passive
+
+20% chance for Husk (0.15×)
+While catching a Husk fish, activates Arcane Finality:
+• Multiply Final Fish Weight by 0.4×
+• Grants a duplicate fish with Requies (9.8×) and Final Fish Weight multiplied by 1.6×
+While fishing, every start and end of an input while the fish is on the bar grants +5% Progress
+Holding and releasing input too fast will snap the reel
+
+Resourceful Rod
+
+Passive
+
+Doubles the effect of all Bait
+60% chance to not consume Bait
+
+Riptide Rod
+
+Passive
+
+After 3 Perfect Catches gain 5 Enhanced Casts granting:
+• 30% chance to hook a higher-rarity fish
+• +25% Lure Speed
+
+Rod Of The Depths
+
+Passive
+
+Every 3 catches, gain another Abyssal fish, with a 10% chance of it being an Enchant Relic
+30% chance for Abyssal (5.5×)
+
+Rod Of The Eternal King
+
+Passive
+
+Every 30 seconds, 5% chance to get 150% luck for 45 seconds
+If a reel is snapped, 15% chance to get a higher-rarity fish
+60% chance for Greedy (5×)
+
+Rod Of The Exalted One
+
+Passive
+
+4× more likely to catch Exalted Relics
+
+Rod Of The Forgotten Fang
+
+Passive
+
+25% chance for Tidal (7×)
+After 3 perfect catches, summons a Megalodon to catch a higher-rarity fish with Tidal, boosting its weight by 25-50%
+
+Rod Of The Zenith
+
+Passive
+
+70% chance for Wrath (4.5×)
++20% Fish Weight
+
+Rod Of Time
+
+Passive
+
++25% XP from all fish
+
+Rod of the Cosmos
+
+Passive
+
+1 in 1000 chance to catch Cosmic Relic.
+15% for Nova (6×).
+
+During Starfall:
+• 1 in 50 chance to catch Cosmic Relic.
+• +50% Progress Speed.
+
+Rose Rend
+
+Passive
+
++15% Progress Speed
+
+Rose Rod
+
+Passive
+
+10% chance every 0.8 seconds to stun fish for 2.5 seconds
+Fully freezes fish after reaching 65% Progress
+80% chance per fish movement to stab for +1% Progress, stunning the fish for 0.35 seconds
+30% chance for Rose (4.5×)
+
+Ruinous Oath
+
+Passive
+
+5% chance for slashes, that fill up 2% progress and stun the fish for 0.05 seconds, every 0.25 seconds. Chances for slashes increase by 8% every second.
+25% chance for Luminescent (6.5×)
+15% chance to grant +60% Progress at the start of the minigame
+
+During Perfect Catch :
+The control bar gradually decreases in size, however the progress speed gradually increases by 5% every second.
+100% chance for Mastered (9×)
+
+Sanguine Spire
+
+Passive
+
+25% chance per fish movement to stab for +2% progress, stunning the fish for 0.35 seconds
+30% chance for Sanguine (5×)
++30% Progress Speed
+
+Santa's Miracle Rod
+
+Passive
+
+20% chance for Santa (8.5×)
+10% chance to obtain one of three mutations:
+• Merry (5×)
+• Gingerbread (5×)
+• Peppermint (5×)
+All three Mutations have equal chances.
+10% chance to gift the fish caught to all players in the server.
+(The gifted fish will not have any mutations, and the weight will be random.)
+
+During Fishing:
+1. Presents will begin falling across the fishing bar
+2. Catching the Falling Presents with the fishing bar will grant +10% Progress
+
+Scarlet Ravager
+
+Passive
+
++20% Progress Speed
+
+Scarlet Spincaster Rod
+
+Passive
+
+30% chance for Crimson (4×)
+
+Scurvy Rod
+
+Passive
+
+15% chance for Greedy (5×)
+
+Seasons Rod
+
+Passive
+
+Depending on current Season, receive the following:
++40% luck for fish preferring current season
+50% chance for Seasonal Mutation:
+Spring: 3.5× Value
+Summer: +25% Size
+Autumn: 4× Value
+Winter: 2.5× Value
+
+Seraphic Rod
+
+Passive
+
+Grants +40% progress over 3 seconds at the start of the minigame
+30% chance for Blessed (8.5×)
+
+Shamrock Rod
+
+Passive
+
+10% chance for Clover (4.5×)
+
+Silly Fun Happy Rod
+
+Passive
+
+Instantly loses fish when it gets out of the fishing bar
++50% Progress Speed
++50% Forced Progress Speed
+50% chance for Honked (2×)
+
+When fishing, one of 5 minigames are guaranteed to happen:
+• Spinning Bar: The player's fishing bar will continuously spin.
+• Random Movement: The player's fishing bar will erratically move across the screen.
+• Fake Catch: The player will get the notification of catching Shiny Sparkling Giant Atlantean Nessie ×10, these notifications are fake and the player will not receive them.
+• Jumpscare: After finishing the minigame, the player will get a jumpscare.
+• Bossfight: The player's Control will be set to -0.29.
+
+Smurf Rod
+
+Passive
+
+10% chance for Smurf (2×)
+
+Sovereign Doombringer
+
+Passive
+
+Summons a Hammer to fill up 30% progress
+
+Spirit of the Forest
+
+Passive
+
+5% every catch to level up a Spirit matching the current season. At night, each Spirit has a 50% chance to level up Nightly Spirit instead if not maxed out.
+
+When all spirits are max level:
+• +10% chance for Forest Spirit (7.5×)
+• +50% Appraisable Mutation chance
+• 60% chance for slashes that fill up 1% progress every 0.3 seconds.
+
+Spiritbinder
+
+Passive
+
+25% chance for Spirit (5.2×)
+5% Chance every catch to gain the highest rarity fish from current pool with Spirit as an additional catch.
+Every 60 seconds gain random fish from current pool with Spirit Mutation
+
+Splitbranch Twig
+
+Passive
+
+35% chance for Rotting (0.7×).
+Each hook will display 2 fish to pick from for 5 seconds. Perfect catches at night will grant both fish.
+
+Spooky Rod
+
+Passive
+
++5% Progress Speed
+10% chance for Frightful (6×)
+10% chance for Spooky (6×)
+10% chance for Eerie (6×)
+Every 1 second 50% chance to gain +4% Progress and freeze the fish for 1 second
+
+Steady Rod
+
+Passive
+
+Doubles shake button size
+
+Summit Rod
+
+Passive
+
++10% Progress Speed
+40% chance for Frozen (1.5×)
+20% chance for Sleet (2.4×)
+15% chance for Blighted (3×)
+
+Sunken Rod
+
+Passive
+
+25% chance for Treasure Map every
+10 catches
+Guaranteed Treasure Map every 230 catches
+8% chance for Sunken (6.3×)
+
+Sweet-Stinger
+
+Passive
+
+30% chance for Honey (2.6×)
+25% chance per movement to unleash 3 Slashes (0.15s interval) each granting 2% Progress and stunning the fish for 0.05 seconds, with a 2 second cooldown.
+Every 45-90 seconds, bees give player a Comb Cluster and 1 minute of Pollinated
+
+Sword of Darkness
+
+Passive
+
+25% chance per fish movement to stab for 3% progress, stunning the fish for 0.35 seconds
+After 3 successful catches in a row, receives an additional +150% Progress Speed and guaranteed Darkness (9.4×) for 30 seconds.
+If a reel is snapped at any point, or the player takes more than 30 seconds between catches, the stacks are reset and the bonus ends.
+
+Tempest Rod
+
+Passive
+
+10% for Electric (2.1×)
++15% Progress Speed
+
+Test Rod
+
+Passive
+
+5% Chance for Lightning (2×)
+
+Thalassar's Ruin
+
+Passive
+
+-25% Progress Speed
+80% chance per fish movement to stab for +1% progress, stunning the fish for 0.35 seconds
+30% chance for Ocean's Ruin (10.2×)
+Every 25 seconds spent catching a fish will grant the player 1 extra fish with Forgotten (2×) or 10% chance for Ocean's Ruin (10.2×) after catching their current fish
+
+The Boom Ball
+
+Passive
+
+50% chance for Exploded (0.1×) with +100% Progress Speed
+
+The Lost Rod
+
+Passive
+
+36% chance for Lost (4.5×) after a perfect catch
+
+Tidal Wave Rod
+
+Passive
+
+20% chance for Beachy (2×)
+5% chance for Summer (6.2×)
+
+Tidemourner
+
+Passive
+
+35% chance for Mourned (7.5×)
+Higher Cast Power will grant Higher Initial Progress
+Perfect Casts have a 50% Chance to Stun the Fish for 5 seconds
+If the Fish stays on the Fishing Bar for 5 Seconds, a Hammer will slam the fish:
+• Stuns for 2 seconds
+• +8% Progress
+• Goes on a 3 seconds cooldown
+
+Toxic Spire Rod
+
+Passive
+
++20% Progress Speed
+15% chance to slow fish movement by 5× and grant +70% Progress Speed
+15% chance for Toxic (6×)
+
+Toxinburst Rod
+
+Passive
+
+Every 1-2 seconds poisonous bursts happens, increasing progress by +4%
++1 Fungus every 2-4 seconds
+Fungus have 20% after 3 seconds to explode and give 2-3 Noxious fish
+Each Fungus lasts for 3 seconds
+
+Tranquility Rod
+
+Passive
+
+Replaces reel with a 4-lane rhythm minigame
+15% chance for Spirit
+
+Treasure Rod
+
+Passive
+
++5% Progress Speed
+20% chance for Gemstone (5×)
+Gives 1,500C$ after catching a Gemstone fish
+
+Trident Rod
+
+Passive
+
+25% chance per fish movement to stab for +6% progress,, stunning the fish for 0.35 seconds
+30% chance for Atlantean (4×)
+
+Tryhard Rod
+
+Passive
+
++165% Progress Speed
++135% Forced Progress Speed
+100% chance for Tryhard (10×)
+
+Upside-Down Rod
+
+Passive
+
+100% chance for Upside-Down (1×)
+
+Verdant Oath
+
+Passive
+
++35% Progress Speed
++15% Forced Progress Speed
+40% chance for Blossomed (4.6×)
+100% chance for Verdant (9.2×) if the fish is perfect caught.
+At the start of the minigame, the bar breaks in half, revealing a green bar in the middle
+• Keeping the fish in this new green bar gains progress as usual
+• The green bar starts at -0.1 Control and slowly expands in size over time to a maximum of 0.3 Control
+• Resilience is reduced based on the bar's size to a minimum of 0.1×
+• If the fish hits the brown sides of the new green bar, immediately lose 20% progress
+
+Verdant Shear Rod
+
+Passive
+
+20% chance to grow a tree for 1 minute
+Fish around the tree for:
+• Mother Nature (3×)
+• Green Leaf (3×)
+• Brown Wood (3×)
+All three Mutations have equal chances.
+
+View Smasher
+
+Passive
+
+Summons a Hammer to fill up 30% progress
+
+Vinefang Rod
+
+Passive
+
++50% Progress Speed
+After 2 perfect catches, the next catch will summon a green Megalodon to catch a higher-rarity fish, boosting its weight by 15-20%
+Every 1 second, 15% chance to unleash 3-5 Slash (0.3s interval) each granting 1% Progress and stunning the fish for 1 second
+
+Vineweaver Rod
+
+Passive
+
+Freezes fish after 70% of progress bar was filled
+30% chance for Vined (3.5×)
++10% Forced Progress Speed
+
+Volcanic Rod
+
+Passive
+
+25% chance for Ashen Fortune (5×)
+
+Voyager Rod
+
+Passive
+
+Grants +20% progress over 3 seconds at the start of the minigame
+35% chance for Fossilized (3.3×)
+
+Wicked Fang Rod
+
+Passive
+
+25% chance per fish movement to stab for +10% progress, stunning the fish for 0.35 seconds
+30% chance for Solarblaze (3×)
++20% Progress Speed
+
+Wildflower Rod
+
+Passive
+
+30% chance for Mother Nature (3×)
+
+Wind Elemental
+
+Passive
+
+Grants +30% progress at the start of the minigame
+30% chance for Breezed (8.6×)
+During Windy:
+• +50% Progress Speed
+
+Wingripper
+
+Passive
+
+During Day:
+• +22% Progress Speed
+• 27% chance for Diurnal (7×)
+
+During Night:
+• +222% Progress Speed
+• 7% chance for Nocturnal (8×)
+• Sets Base Control to -0.28
+
+Wisdom Rod
+
+Passive
+
++5% XP for every perfect catch streak
+-10% XP for every perfect catch failed
+Capping at +80%, cant go below 0%
+
+Zeus Rod
+
+Passive
+
+Each catch has a 20% chance for a thunderstorm, that lasts 2 minutes.
+
+Catches inside it provide:
+• +175 Luck (total 265 Luck);
+• 90% chance for Electric Shock (3.5×);
+• 10% chance for Charred (0.5×)
+
+Zeus's Thundermaul
+
+Passive
+
+10% for Zeus's Storm (9.3×)
+Perfect Casts grant +50% Initial Progress
+Outside of Rain:
+• Every 3 seconds lightning strikes, granting +2% Progress
+During Rain:
+• Every 3 seconds lightning strikes, granting +4% Progress
+Charges up after 180 seconds
+Achieving a Perfect Cast when fully charged up will trigger the Electrified State, lasting 30 seconds:
+• 90% for Electric (2.1×)
