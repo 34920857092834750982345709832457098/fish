@@ -59,6 +59,8 @@ class FischDesktopApp:
         self.root = root
         self.root.title("Fisch Rod Explorer")
         self.root.geometry("1250x760")
+        self.style = ttk.Style(self.root)
+        self.style.theme_use("clam")
 
         self.index_path_var = tk.StringVar(value=str(Path(DEFAULT_INDEX_FILE).resolve()))
         self.wiki_url_var = tk.StringVar(value=DEFAULT_URL)
@@ -207,15 +209,44 @@ class FischDesktopApp:
 
     def _apply_theme(self) -> None:
         if self.dark_mode_var.get():
-            self.compare_text.configure(bg="#1e1e1e", fg="#f0f0f0", insertbackground="#f0f0f0")
+            charcoal = "#2b2b2b"
+            light_text = "#f5f5f5"
+            muted = "#3a3a3a"
+            self.compare_text.configure(bg=charcoal, fg=light_text, insertbackground=light_text)
             self.tree.tag_configure("odd", background="#42507a", foreground="white")
             self.tree.tag_configure("even", background="#232323", foreground="white")
-            self.root.configure(bg="#121212")
+            self.style.configure("TFrame", background=charcoal)
+            self.style.configure("TLabel", background=charcoal, foreground=light_text)
+            self.style.configure("TLabelframe", background=charcoal, bordercolor=muted)
+            self.style.configure("TLabelframe.Label", background=charcoal, foreground=light_text)
+            self.style.configure("TButton", background=muted, foreground=light_text)
+            self.style.map("TButton", background=[("active", "#4a4a4a")], foreground=[("active", light_text)])
+            self.style.configure("TCheckbutton", background=charcoal, foreground=light_text)
+            self.style.configure("TEntry", fieldbackground="#1f1f1f", foreground=light_text)
+            self.style.configure("TCombobox", fieldbackground="#1f1f1f", foreground=light_text, background=muted)
+            self.style.map("TCombobox", fieldbackground=[("readonly", "#1f1f1f")], foreground=[("readonly", light_text)])
+            self.style.configure("Treeview", background="#232323", foreground=light_text, fieldbackground="#232323")
+            self.style.configure("Treeview.Heading", background=muted, foreground=light_text)
+            self.root.configure(bg=charcoal)
+            self.context_menu.configure(background=charcoal, foreground=light_text, activebackground="#4a4a4a", activeforeground=light_text)
         else:
             self.compare_text.configure(bg="white", fg="black", insertbackground="black")
             self.tree.tag_configure("odd", background="#a4b4db", foreground="black")
             self.tree.tag_configure("even", background="white", foreground="black")
+            self.style.configure("TFrame", background="SystemButtonFace")
+            self.style.configure("TLabel", background="SystemButtonFace", foreground="black")
+            self.style.configure("TLabelframe", background="SystemButtonFace")
+            self.style.configure("TLabelframe.Label", background="SystemButtonFace", foreground="black")
+            self.style.configure("TButton", background="SystemButtonFace", foreground="black")
+            self.style.map("TButton", background=[("active", "#e6e6e6")], foreground=[("active", "black")])
+            self.style.configure("TCheckbutton", background="SystemButtonFace", foreground="black")
+            self.style.configure("TEntry", fieldbackground="white", foreground="black")
+            self.style.configure("TCombobox", fieldbackground="white", foreground="black", background="SystemButtonFace")
+            self.style.map("TCombobox", fieldbackground=[("readonly", "white")], foreground=[("readonly", "black")])
+            self.style.configure("Treeview", background="white", foreground="black", fieldbackground="white")
+            self.style.configure("Treeview.Heading", background="#e8e8e8", foreground="black")
             self.root.configure(bg="SystemButtonFace")
+            self.context_menu.configure(background="SystemButtonFace", foreground="black", activebackground="#d9d9d9", activeforeground="black")
 
     def apply_search_filter(self) -> None:
         q = self.search_var.get().strip().lower()

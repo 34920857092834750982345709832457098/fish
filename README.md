@@ -78,6 +78,9 @@ python rod_compare.py --input-html Fishing_Rods.html --top 10 --sort luck
 - The script scrapes the table from `https://fischipedia.org/wiki/Fishing_Rods` by default.
 - If direct HTML table parsing fails, the script attempts a MediaWiki raw-text fallback (`?action=raw`).
 - Add `--scan-passives` to fetch each rod's individual wiki page and enrich passive descriptions.
+- Optional passive override file: place `passive_overrides.txt` in the project root to force passive text by rod name when wiki markup is inconsistent.
+  - Format: rod name on one line, `Passive` line optional, then one or more passive description lines.
+  - The loader matches only known rod names from the current index refresh.
 - Individual rod pages are discovered by replacing spaces with `_` in the rod name (e.g., `Brine-Infused Rod` -> `/wiki/Brine-Infused_Rod`).
 - If network access to the site is blocked, save the page as HTML in your browser and pass the file via `--input-html`.
 - `--scan-passives` is online-only and cannot be combined with `--input-html`.

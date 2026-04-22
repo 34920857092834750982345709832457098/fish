@@ -525,6 +525,60 @@ def enrich_rod_details_online(rods: list[Rod], fishing_rods_url: str) -> None:
             rod.passive = details["passive"]
 
 
+def parse_passive_overrides_text(raw_text: str, valid_rod_names: Iterable[str]) -> dict[str, str]:
+    valid_lookup = {name.casefold(): name for name in valid_rod_names if name}
+    lines = raw_text.splitlines()
+    overrides: dict[str, str] = {}
+    current_rod: str | None = None
+    collected: list[str] = []
+
+    def flush() -> None:
+        nonlocal current_rod, collected
+        if not current_rod:
+            return
+        text = "\n".join(line for line in collected if line.strip()).strip()
+        if text:
+            overrides[current_rod] = text
+        current_rod = None
+        collected = []
+
+    for raw_line in lines:
+        line = raw_line.strip()
+        if not line:
+            if current_rod:
+                collected.append("")
+            continue
+        candidate = valid_lookup.get(line.casefold())
+        if candidate:
+            flush()
+            current_rod = candidate
+            continue
+        if current_rod:
+            if line.casefold() == "passive":
+                continue
+            collected.append(line)
+
+    flush()
+    return overrides
+
+
+def load_passive_overrides(path: str, valid_rod_names: Iterable[str]) -> dict[str, str]:
+    file_path = Path(path)
+    if not file_path.exists():
+        return {}
+    content = file_path.read_text(encoding="utf-8")
+    return parse_passive_overrides_text(content, valid_rod_names)
+
+
+def apply_passive_overrides(rods: list[Rod], overrides: dict[str, str]) -> None:
+    if not overrides:
+        return
+    for rod in rods:
+        override = overrides.get(rod.name)
+        if override:
+            rod.passive = override
+
+
 def filter_rods(rods: Iterable[Rod], names: list[str] | None) -> list[Rod]:
     if not names:
         return list(rods)
@@ -645,6 +699,8 @@ def main(argv: list[str]) -> int:
 
     if args.scan_passives:
         enrich_rod_details_online(rods, args.url)
+        overrides = load_passive_overrides("passive_overrides.txt", [rod.name for rod in rods])
+        apply_passive_overrides(rods, overrides)
 
     rods = filter_rods(rods, args.rods)
     if not rods:

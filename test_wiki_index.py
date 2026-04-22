@@ -20,7 +20,7 @@ def test_save_and_load_index(tmp_path: Path):
 
 
 def test_refresh_index_uses_fetch_and_enrich(monkeypatch, tmp_path: Path):
-    calls = {"fetch": 0, "enrich": 0}
+    calls = {"fetch": 0, "enrich": 0, "load_overrides": 0, "apply_overrides": 0}
 
     def fake_fetch(url: str):
         calls["fetch"] += 1
@@ -30,12 +30,22 @@ def test_refresh_index_uses_fetch_and_enrich(monkeypatch, tmp_path: Path):
         calls["enrich"] += 1
         rods[0].passive = "Speed burst"
 
+    def fake_load_overrides(path: str, names):
+        calls["load_overrides"] += 1
+        return {"A Rod": "Override passive"}
+
+    def fake_apply_overrides(rods, overrides):
+        calls["apply_overrides"] += 1
+        rods[0].passive = overrides.get("A Rod", rods[0].passive)
+
     monkeypatch.setattr("wiki_index.fetch_rods", fake_fetch)
     monkeypatch.setattr("wiki_index.enrich_rod_details_online", fake_enrich)
+    monkeypatch.setattr("wiki_index.load_passive_overrides", fake_load_overrides)
+    monkeypatch.setattr("wiki_index.apply_passive_overrides", fake_apply_overrides)
 
     out = tmp_path / "idx.json"
     result = refresh_index("https://fischipedia.org/wiki/Fishing_Rods", str(out), scan_passives=True)
 
-    assert calls == {"fetch": 1, "enrich": 1}
+    assert calls == {"fetch": 1, "enrich": 1, "load_overrides": 1, "apply_overrides": 1}
     assert out.exists()
-    assert result[0]["passive"] == "Speed burst"
+    assert result[0]["passive"] == "Override passive"

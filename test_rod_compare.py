@@ -2,12 +2,14 @@ from pathlib import Path
 
 from rod_compare import (
     WikiTableParser,
+    apply_passive_overrides,
     choose_rod_tables,
     extract_passive_from_rod_page,
     extract_passive_from_raw_wikitext,
     enrich_rod_details_online,
     fetch_rod_page_details,
     load_rods_from_local_html,
+    parse_passive_overrides_text,
     map_header_indices,
     parse_number,
     parse_rods_from_html,
@@ -219,3 +221,26 @@ def test_fetch_rod_page_details_uses_raw_passive_fallback(monkeypatch):
     monkeypatch.setattr("rod_compare.urlopen", fake_urlopen)
     details = fetch_rod_page_details("Brine-Infused Rod", "https://fischipedia.org")
     assert details["passive"] == "Brined (3.5×)"
+
+
+def test_parse_passive_overrides_text_with_multiline_blocks():
+    text = """
+    Arctic Rod
+
+    Passive
+
+    All fish caught are Frozen (1.5×)
+
+    Brine-Infused Rod
+    Passive
+    50% chance for Brined (3.5×)
+    """
+    overrides = parse_passive_overrides_text(text, ["Arctic Rod", "Brine-Infused Rod"])
+    assert overrides["Arctic Rod"] == "All fish caught are Frozen (1.5×)"
+    assert overrides["Brine-Infused Rod"] == "50% chance for Brined (3.5×)"
+
+
+def test_apply_passive_overrides_updates_passive():
+    rods = [Rod(name="Arctic Rod", source="Purchasing", passive="-")]
+    apply_passive_overrides(rods, {"Arctic Rod": "All fish caught are Frozen (1.5×)"})
+    assert rods[0].passive == "All fish caught are Frozen (1.5×)"

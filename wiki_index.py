@@ -14,7 +14,13 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from rod_compare import Rod, enrich_rod_details_online, fetch_rods
+from rod_compare import (
+    Rod,
+    apply_passive_overrides,
+    enrich_rod_details_online,
+    fetch_rods,
+    load_passive_overrides,
+)
 
 DEFAULT_INDEX_FILE = "rods_index.json"
 
@@ -42,9 +48,12 @@ def refresh_index(
     wiki_url: str,
     output_path: str = DEFAULT_INDEX_FILE,
     scan_passives: bool = True,
+    passive_overrides_path: str = "passive_overrides.txt",
 ) -> list[dict[str, Any]]:
     rods = fetch_rods(wiki_url)
     if scan_passives:
         enrich_rod_details_online(rods, wiki_url)
+    overrides = load_passive_overrides(passive_overrides_path, [rod.name for rod in rods])
+    apply_passive_overrides(rods, overrides)
     save_index(rods, output_path)
     return normalize_rods(rods)
