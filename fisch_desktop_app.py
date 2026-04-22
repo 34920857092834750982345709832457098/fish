@@ -80,6 +80,7 @@ class FischDesktopApp:
         self.visible_compare_slots = 2
         self._default_passive_width = 200
         self._sort_state: dict[str, bool] = {}
+        self._passive_popup: tk.Toplevel | None = None
 
         self._build_ui()
         self.search_var.trace_add("write", lambda *_: self.apply_search_filter())
@@ -218,6 +219,7 @@ class FischDesktopApp:
         self._apply_theme()
 
     def _apply_theme(self) -> None:
+        self._hide_passive_popup()
         if self.dark_mode_var.get():
             charcoal = "#2b2b2b"
             light_text = "#f5f5f5"
@@ -424,25 +426,65 @@ class FischDesktopApp:
     def _on_tree_left_click(self, event) -> None:
         column_id = self.tree.identify_column(event.x)
         if not column_id or column_id == "#0":
+            self._hide_passive_popup()
             return
         column_index = int(column_id[1:]) - 1
         if column_index < 0 or column_index >= len(DISPLAY_COLUMNS):
+            self._hide_passive_popup()
             return
 
         clicked_col = DISPLAY_COLUMNS[column_index]
         if clicked_col != "passive":
-            self.tree.column("passive", width=self._default_passive_width)
+            self._hide_passive_popup()
             return
 
         row_id = self.tree.identify_row(event.y)
         if not row_id:
+            self._hide_passive_popup()
             return
         values = self.tree.item(row_id, "values")
         if not values:
+            self._hide_passive_popup()
             return
         passive_value = str(values[column_index]) if column_index < len(values) else ""
-        target_width = max(self._default_passive_width, min(1200, len(passive_value) * 7))
-        self.tree.column("passive", width=target_width)
+        if not passive_value or passive_value == "-":
+            self._hide_passive_popup()
+            return
+        self._show_passive_popup(event.x_root, event.y_root, passive_value)
+
+    def _show_passive_popup(self, x_root: int, y_root: int, text: str) -> None:
+        self._hide_passive_popup()
+        popup = tk.Toplevel(self.root)
+        popup.wm_overrideredirect(True)
+        popup.attributes("-topmost", True)
+        bg = "#2b2b2b" if self.dark_mode_var.get() else "white"
+        fg = "#f5f5f5" if self.dark_mode_var.get() else "black"
+        border = "#42507a" if self.dark_mode_var.get() else "#a4b4db"
+        popup.configure(bg=border)
+
+        container = tk.Frame(popup, bg=bg, padx=8, pady=6)
+        container.pack(padx=1, pady=1)
+        label = tk.Label(
+            container,
+            text=text,
+            bg=bg,
+            fg=fg,
+            justify="left",
+            anchor="w",
+            wraplength=640,
+        )
+        label.pack(fill="both", expand=True)
+        popup.update_idletasks()
+        popup.geometry(f"+{x_root + 10}+{y_root + 10}")
+        popup.bind("<FocusOut>", lambda *_: self._hide_passive_popup())
+        popup.bind("<Escape>", lambda *_: self._hide_passive_popup())
+        popup.focus_force()
+        self._passive_popup = popup
+
+    def _hide_passive_popup(self) -> None:
+        if self._passive_popup and self._passive_popup.winfo_exists():
+            self._passive_popup.destroy()
+        self._passive_popup = None
 
     def add_selected_row_to_compare(self) -> None:
         selected = self.tree.selection()

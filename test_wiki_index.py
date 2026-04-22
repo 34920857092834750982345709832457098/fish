@@ -20,7 +20,14 @@ def test_save_and_load_index(tmp_path: Path):
 
 
 def test_refresh_index_uses_fetch_and_enrich(monkeypatch, tmp_path: Path):
-    calls = {"fetch": 0, "enrich": 0, "load_overrides": 0, "apply_overrides": 0}
+    calls = {
+        "fetch": 0,
+        "enrich": 0,
+        "load_overrides": 0,
+        "apply_overrides": 0,
+        "load_level_overrides": 0,
+        "apply_level_overrides": 0,
+    }
 
     def fake_fetch(url: str):
         calls["fetch"] += 1
@@ -38,14 +45,31 @@ def test_refresh_index_uses_fetch_and_enrich(monkeypatch, tmp_path: Path):
         calls["apply_overrides"] += 1
         rods[0].passive = overrides.get("A Rod", rods[0].passive)
 
+    def fake_load_level_overrides(path: str, names):
+        calls["load_level_overrides"] += 1
+        return {"A Rod": "Level 99"}
+
+    def fake_apply_level_overrides(rods, overrides):
+        calls["apply_level_overrides"] += 1
+        rods[0].level_requirement = overrides.get("A Rod", rods[0].level_requirement)
+
     monkeypatch.setattr("wiki_index.fetch_rods", fake_fetch)
     monkeypatch.setattr("wiki_index.enrich_rod_details_online", fake_enrich)
     monkeypatch.setattr("wiki_index.load_passive_overrides", fake_load_overrides)
     monkeypatch.setattr("wiki_index.apply_passive_overrides", fake_apply_overrides)
+    monkeypatch.setattr("wiki_index.load_level_overrides", fake_load_level_overrides)
+    monkeypatch.setattr("wiki_index.apply_level_overrides", fake_apply_level_overrides)
 
     out = tmp_path / "idx.json"
     result = refresh_index("https://fischipedia.org/wiki/Fishing_Rods", str(out), scan_passives=True)
 
-    assert calls == {"fetch": 1, "enrich": 1, "load_overrides": 1, "apply_overrides": 1}
+    assert calls == {
+        "fetch": 1,
+        "enrich": 1,
+        "load_overrides": 1,
+        "apply_overrides": 1,
+        "load_level_overrides": 1,
+        "apply_level_overrides": 1,
+    }
     assert out.exists()
     assert result[0]["passive"] == "Override passive"

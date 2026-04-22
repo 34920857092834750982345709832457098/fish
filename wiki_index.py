@@ -16,9 +16,11 @@ from typing import Any
 
 from rod_compare import (
     Rod,
+    apply_level_overrides,
     apply_passive_overrides,
     enrich_rod_details_online,
     fetch_rods,
+    load_level_overrides,
     load_passive_overrides,
 )
 
@@ -49,11 +51,14 @@ def refresh_index(
     output_path: str = DEFAULT_INDEX_FILE,
     scan_passives: bool = True,
     passive_overrides_path: str = "passive_overrides.txt",
+    level_overrides_path: str = "level_overrides.txt",
 ) -> list[dict[str, Any]]:
     rods = fetch_rods(wiki_url)
     if scan_passives:
         enrich_rod_details_online(rods, wiki_url)
     overrides = load_passive_overrides(passive_overrides_path, [rod.name for rod in rods])
     apply_passive_overrides(rods, overrides)
+    level_overrides = load_level_overrides(level_overrides_path, [rod.name for rod in rods])
+    apply_level_overrides(rods, level_overrides)
     save_index(rods, output_path)
     return normalize_rods(rods)

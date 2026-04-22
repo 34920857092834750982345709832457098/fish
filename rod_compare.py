@@ -587,6 +587,40 @@ def apply_passive_overrides(rods: list[Rod], overrides: dict[str, str]) -> None:
             rod.passive = override
 
 
+def parse_level_overrides_text(raw_text: str, valid_rod_names: Iterable[str]) -> dict[str, str]:
+    valid_lookup = {name.casefold(): name for name in valid_rod_names if name}
+    overrides: dict[str, str] = {}
+    for raw_line in raw_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        match = re.match(r"^(.*?)\s*-\s*Level\s*(\d+)\s*$", line, flags=re.IGNORECASE)
+        if not match:
+            continue
+        rod_name, level = match.group(1).strip(), match.group(2).strip()
+        canonical = valid_lookup.get(rod_name.casefold())
+        if canonical:
+            overrides[canonical] = f"Level {level}"
+    return overrides
+
+
+def load_level_overrides(path: str, valid_rod_names: Iterable[str]) -> dict[str, str]:
+    file_path = Path(path)
+    if not file_path.exists():
+        return {}
+    content = file_path.read_text(encoding="utf-8")
+    return parse_level_overrides_text(content, valid_rod_names)
+
+
+def apply_level_overrides(rods: list[Rod], overrides: dict[str, str]) -> None:
+    if not overrides:
+        return
+    for rod in rods:
+        override = overrides.get(rod.name)
+        if override:
+            rod.level_requirement = override
+
+
 def filter_rods(rods: Iterable[Rod], names: list[str] | None) -> list[Rod]:
     if not names:
         return list(rods)
@@ -711,6 +745,8 @@ def main(argv: list[str]) -> int:
         enrich_rod_details_online(rods, args.url)
         overrides = load_passive_overrides("passive_overrides.txt", [rod.name for rod in rods])
         apply_passive_overrides(rods, overrides)
+    level_overrides = load_level_overrides("level_overrides.txt", [rod.name for rod in rods])
+    apply_level_overrides(rods, level_overrides)
 
     rods = filter_rods(rods, args.rods)
     if not rods:

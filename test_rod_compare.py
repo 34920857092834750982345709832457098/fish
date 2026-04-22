@@ -2,6 +2,7 @@ from pathlib import Path
 
 from rod_compare import (
     WikiTableParser,
+    apply_level_overrides,
     apply_passive_overrides,
     choose_rod_tables,
     extract_passive_from_rod_page,
@@ -12,6 +13,7 @@ from rod_compare import (
     parse_passive_overrides_text,
     map_header_indices,
     parse_number,
+    parse_level_overrides_text,
     parse_rods_from_html,
     parse_rods_from_wikitext,
     row_to_rod,
@@ -246,3 +248,19 @@ def test_apply_passive_overrides_updates_passive():
     rods = [Rod(name="Arctic Rod", source="Purchasing", passive="-")]
     apply_passive_overrides(rods, {"Arctic Rod": "All fish caught are Frozen (1.5×)"})
     assert rods[0].passive == "All fish caught are Frozen (1.5×)"
+
+
+def test_parse_level_overrides_text():
+    text = """
+    Arctic Rod - Level 0
+    Brine-Infused Rod - Level 20
+    """
+    overrides = parse_level_overrides_text(text, ["Arctic Rod", "Brine-Infused Rod"])
+    assert overrides["Arctic Rod"] == "Level 0"
+    assert overrides["Brine-Infused Rod"] == "Level 20"
+
+
+def test_apply_level_overrides():
+    rods = [Rod(name="Arctic Rod", source="Purchasing", level_requirement=None)]
+    apply_level_overrides(rods, {"Arctic Rod": "Level 0"})
+    assert rods[0].level_requirement == "Level 0"

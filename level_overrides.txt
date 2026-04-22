@@ -1,439 +1,220 @@
 Abyssal Specter Rod - Level 170
-
 Adventurer's Rod - Level 0
-
 Anchor n' Chain - Level 25
-
 Antler Rod - Level 0
-
 Apollo's Sunshot - Level 0
-
 Arctic Rod - Level 0
-
 Astraeus Serenade - Level 1
-
 Astral Rod - Level 0
-
 Astralhook Rod - Level 2500
-
 Auric Rod - Level 0
-
 Aurora Rod - Level 0
-
 Avalanche Rod - Level 0
-
 Axe of Rhoads - Level 1000
-
 Azure Of Lagoon - Level 0
-
 Bat Whisperer Rod - Level 0
-
 Bellona's Waraxe - Level 0
-
 Blade Of Glorp - Level 8888
-
 Blazebringer Rod - Level 0
-
 Bloomspire - Level 0
-
 Bloomspire: Blooming Splendor - Level 0
-
 Bloomspire: Slumbering Elegance - Level 0
-
 Bloomspire: Twisted Toxins - Level 0
-
 Bone Blade - Level 0
-
 Boreal Rod - Level 0
-
 Brick Built Rod - Level 0
-
 Brick Rod - Level 0
-
 Brine-Infused Rod - Level 0
-
 Brother's Rod - Level 0
-
 Buddy Bond Rod - Level 0
-
 Bunnybloom Caster - Level 0
-
 Candy Cane Rod - Level 0
-
 Carbon Rod - Level 0
-
 Carrot Rod - Level 0
-
 Celestial Rod - Level 800
-
 Cerebra - Level 0
-
 Cerulean Fang Rod - Level 400
-
 Challenger's Rod - Level 110
-
 Champions Rod - Level 0
-
 Christmas Tree Rod - Level 0
-
 Chrysalis - Level 1000
-
 Cinder Block Rod - Level 0
-
 Cinderstring - Level 0
-
 Clickbait Caster - Level 0
-
 Clover Rod - Level 0
-
 Coral Rod - Level 0
-
 Cornucopia Rod - Level 0
-
 Cryolash - Level 650
-
 Crystalized Rod - Level 0
-
 Cupid's Bow - Level 0
-
 Cupid's Embrace - Level 100
-
 Dave Rod - Level 250
-
 Daybreaker Rod - Level 0
-
 Dead Man's Rod - Level 1000
-
 Decayed Rod - Level 0
-
 Demon-Slayer - Level 0
-
 Depthseeker Rod - Level 0
-
 Destiny Rod - Level 0
-
 Dreambreaker - Level 750
-
 Dusekkar Rod - Level 0
-
 Duskwire - Level 275
-
 Eardrum - Level 0
-
 Egg Rod - Level 0
-
 Eidolon Rod - Level 350
-
 Elder Mossripper - Level 350
-
 Electric Guitar - Level 0
-
 Ethereal Prism Rod - Level 250
-
 Event Horizon Rod - Level 0
-
 Evil Pitchfork - Level 500
-
 Experimental Rod - Level 0
-
 Fabulous Rod - Level 1000
-
 Fallen Rod - Level 0
-
 Fallen Snowblade - Level 0
-
 Fang of the Eclipse - Level 2000
-
 Fast Rod - Level 0
-
 Firefly Rod - Level 0
-
 Firework Rod - Level 0
-
 Fischer's Rod - Level 0
-
 Fischmas Rod - Level 0
-
 Fish Photographer - Level 0
-
 Fixer's Rod - Level 0
-
 Flimsy Rod - Level 0
-
 Fortune Rod - Level 0
-
 Free Spirit Rod - Level 0
-
 Friendly Rod - Level 0
-
 Frog Rod - Level 0
-
 Frost Warden Rod - Level 0
-
 Frostbane Rod - Level 0
-
 Frostfire Rod - Level 0
-
 Fungal Rod - Level 0
-
 Gardenkeeper Rod - Level 300
-
 Gingerbread Rod - Level 0
-
 Great Dreamer Rod - Level 0
-
 Great Rod of Oscar - Level 250
-
 Hades' Soul-Scythe - Level 0
-
 Haunted Rod - Level 0
-
 Heaven's Rod - Level 220
-
 Ice Warpers Rod - Level 0
-
 Igneous Rupturer - Level 500
-
 Jack-o-Blazer - Level 0
-
 Jinglestar Rod - Level 0
-
 Katana Rod - Level 0
-
 Kings Rod - Level 0
-
 Kraken Rod - Level 180
-
 Krampus's Rod - Level 150
-
 Leprechaun Line - Level 0
-
 Leviathan's Fang Rod - Level 0
-
 Lobster Rod - Level 0
-
 Long Rod - Level 0
-
 Lucid Rod - Level 50
-
 Lucky Rod - Level 0
-
 Luminescent Oath - Level 500
-
 Maelstrom - Level 0
-
 Magma Rod - Level 0
-
 Magnet Rod - Level 0
-
 Masterline Rod - Level 0
-
 Merchant Rod - Level 0
-
 Merlin's Staff - Level 0
-
 Microphone Rod - Level 0
-
 Midas Rod - Level 0
-
 MiguRod - Level 401
-
 Mission Specialist's Rod - Level 0
-
 Mythical Rod - Level 0
-
 Nates Blade - Level 0
-
 Necrotic Rod - Level 100
-
 New Years Rod - Level 0
-
 Nico's Yarncaster - Level 0
-
 NilCaster - Level 0
-
 No-Life Rod - Level 500
-
 Noctone - Level 1000
-
 Nocturnal Rod - Level 0
-
 North Pole - Level 500
-
 North-Star Rod - Level 0
-
 Olympian Godbreaker - Level 0
-
 Onirifalx - Level 1000
-
 Original No-Life Rod - Level 0
-
 Paintbrush - Level 0
-
 Paleontologist's Rod - Level 0
-
 Paper Fan Rod - Level 0
-
 Patriot Rod - Level 0
-
 Pen Rod - Level 0
-
 Peppermint Rod - Level 0
-
 Phoenix Rod - Level 0
-
 Pinion's Aria - Level 424
-
 Plaguereaver - Level 0
-
 Plastic Rod - Level 0
-
 Polaris Serenade - Level 0
-
 Popsicle Rod - Level 0
-
 Poseidon Rod - Level 100
-
 Poseidon's Lance - Level 0
-
 Precision Rod - Level 5
-
 Rainbow Cluster Rod - Level 0
-
 Random Rod - Level 0
-
 Rapid Rod - Level 0
-
 Reinforced Rod - Level 0
-
 Relic Rod - Level 0
-
 Requiem - Level 1000
-
 Resourceful Rod - Level 50
-
 Riptide Rod - Level 30
-
 Rod Of The Depths - Level 0
-
 Rod Of The Eternal King - Level 400
-
 Rod Of The Exalted One - Level 0
-
 Rod Of The Forgotten Fang - Level 700
-
 Rod Of The Zenith - Level 150
-
 Rod Of Time - Level 0
-
 Rod of the Cosmos - Level 0
-
 Rose Rend - Level 0
-
 Rose Rod - Level 0
-
 Ruinous Oath - Level 750
-
 Sanguine Spire - Level 0
-
 Santa's Miracle Rod - Level 0
-
 Scarlet Ravager - Level 0
-
 Scarlet Spincaster Rod - Level 0
-
 Scurvy Rod - Level 0
-
 Seasons Rod - Level 40
-
 Seraphic Rod - Level 1000
-
 Shamrock Rod - Level 0
-
 Silly Fun Happy Rod - Level 0
-
 Smurf Rod - Level 0
-
 Sovereign Doombringer - Level 0
-
 Spirit of the Forest - Level 0
-
 Spiritbinder - Level 850
-
 Splitbranch Twig - Level 0
-
 Spooky Rod - Level 0
-
 Steady Rod - Level 0
-
 Stone Hammer - Level 0
-
 Stone Rod - Level 0
-
 Summit Rod - Level 0
-
 Sunken Rod - Level 0
-
 Superstar Rod - Level 0
-
 Sweet-Stinger - Level 0
-
 Sword of Darkness - Level 0
-
 Tempest Rod - Level 80
-
 Test Rod - Level 0
-
 Thalassar's Ruin - Level 0
-
 The Boom Ball - Level 0
-
 The Lost Rod - Level 100
-
 Tidal Wave Rod - Level 0
-
 Tidemourner - Level 200
-
 Toxic Spire Rod - Level 90
-
 Toxinburst Rod - Level 150
-
 Training Rod - Level 0
-
 Tranquility Rod - Level 0
-
 Treasure Rod - Level 0
-
 Trident Rod - Level 0
-
 Tryhard Rod - Level 999
-
 Upside-Down Rod - Level 0
-
 Verdant Oath - Level 1000
-
 Verdant Shear Rod - Level 0
-
 View Smasher - Level 0
-
 Vinefang Rod - Level 0
-
 Vineweaver Rod - Level 40
-
 Volcanic Rod - Level 0
-
 Voyager Rod - Level 80
-
 Wicked Fang Rod - Level 300
-
 Wildflower Rod - Level 0
-
 Wind Elemental - Level 800
-
 Wingripper - Level 0
-
 Wisdom Rod - Level 80
-
 Zeus Rod - Level 150
-
 Zeus's Thundermaul - Level 0
