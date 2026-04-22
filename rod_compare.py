@@ -35,6 +35,7 @@ class Rod:
     max_kg: float | None = None
     price: float | None = None
     durability: str | None = None
+    level_requirement: str | None = None
     disturbance: str | None = None
     hunt_focus: str | None = None
     line_distance: str | None = None
@@ -203,6 +204,7 @@ def map_header_indices(headers: list[str]) -> dict[str, int]:
         "max_kg": [["max", "kg"]],
         "price": [["price"], ["cost"], ["c$"], ["$"]],
         "durability": [["durability"]],
+        "level_requirement": [["level", "requirement"], ["level"]],
         "disturbance": [["disturbance"]],
         "hunt_focus": [["hunt", "focus"]],
         "line_distance": [["line", "distance"]],
@@ -255,6 +257,7 @@ def row_to_rod(row: list[str], idx: dict[str, int]) -> Rod | None:
         max_kg=parse_number(get("max_kg")),
         price=price_value,
         durability=normalize_durability_text(get("durability") or None),
+        level_requirement=get("level_requirement") or None,
         disturbance=disturbance,
         hunt_focus=hunt_focus,
         line_distance=get("line_distance") or None,
@@ -447,6 +450,9 @@ def normalize_rod_detail_fields(fields: dict[str, str]) -> dict[str, str]:
         "resilience": "resilience",
         "max kg": "max_kg",
         "durability": "durability",
+        "level requirement": "level_requirement",
+        "level req": "level_requirement",
+        "level": "level_requirement",
         "disturbance": "disturbance",
         "hunt focus": "hunt_focus",
         "line distance": "line_distance",
@@ -514,6 +520,8 @@ def enrich_rod_details_online(rods: list[Rod], fishing_rods_url: str) -> None:
                 rod.price = parsed_price
         if details.get("durability"):
             rod.durability = normalize_durability_text(details["durability"])
+        if details.get("level_requirement"):
+            rod.level_requirement = details["level_requirement"]
         if details.get("disturbance"):
             rod.disturbance = details["disturbance"]
         if details.get("hunt_focus"):
@@ -600,6 +608,7 @@ def print_table(rods: list[Rod]) -> None:
         "MaxKg",
         "Price",
         "Stage",
+        "Level Req",
         "Durability",
         "Disturbance",
         "Hunt Focus",
@@ -617,6 +626,7 @@ def print_table(rods: list[Rod]) -> None:
             fmt(rod.max_kg),
             fmt_price(rod.price, rod.source),
             rod.stage or "-",
+            rod.level_requirement or "-",
             rod.durability or "-",
             rod.disturbance or "-",
             rod.hunt_focus or "-",

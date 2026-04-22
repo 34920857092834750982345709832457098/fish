@@ -26,6 +26,7 @@ DISPLAY_COLUMNS = [
     "max_kg",
     "price",
     "stage",
+    "level_requirement",
     "durability",
     "disturbance",
     "hunt_focus",
@@ -43,6 +44,7 @@ COLUMN_TITLES = {
     "max_kg": "Max Kg",
     "price": "Price",
     "stage": "Stage",
+    "level_requirement": "Level Req",
     "durability": "Durability",
     "disturbance": "Disturbance",
     "hunt_focus": "Hunt Focus",
@@ -76,6 +78,8 @@ class FischDesktopApp:
         self.compare_combos: list[ttk.Combobox] = []
         self.compare_labels: list[ttk.Label] = []
         self.visible_compare_slots = 2
+        self._default_passive_width = 200
+        self._sort_state: dict[str, bool] = {}
 
         self._build_ui()
         self.search_var.trace_add("write", lambda *_: self.apply_search_filter())
@@ -118,12 +122,17 @@ class FischDesktopApp:
 
         self.tree = ttk.Treeview(middle, columns=DISPLAY_COLUMNS, show="headings", height=16)
         for col in DISPLAY_COLUMNS:
-            self.tree.heading(col, text=COLUMN_TITLES[col])
+            sortable = col not in {"passive", "location", "source"}
+            self.tree.heading(
+                col,
+                text=COLUMN_TITLES[col],
+                command=(lambda c=col: self.sort_by_column(c)) if sortable else "",
+            )
             width = 85
             if col == "name":
                 width = 135
             elif col == "passive":
-                width = 200
+                width = self._default_passive_width
             elif col == "location":
                 width = 110
             elif col == "durability":
@@ -135,6 +144,7 @@ class FischDesktopApp:
             self.tree.column(col, width=width, stretch=True, anchor="w")
         self.tree.pack(fill="both", expand=True)
         self.tree.bind("<Button-3>", self._on_tree_right_click)
+        self.tree.bind("<ButtonRelease-1>", self._on_tree_left_click)
         self.tree.tag_configure("odd", background="#a4b4db", foreground="black")
         self.tree.tag_configure("even", background="white", foreground="black")
         self.tree.tag_configure("limited_location", foreground="red")
@@ -217,7 +227,7 @@ class FischDesktopApp:
             self.tree.tag_configure("even", background="#232323", foreground="white")
             self.style.configure("TFrame", background=charcoal)
             self.style.configure("TLabel", background=charcoal, foreground=light_text)
-            self.style.configure("TLabelframe", background=charcoal, bordercolor=muted)
+            self.style.configure("TLabelframe", background=charcoal, bordercolor="#42507a")
             self.style.configure("TLabelframe.Label", background=charcoal, foreground=light_text)
             self.style.configure("TButton", background=muted, foreground=light_text)
             self.style.map("TButton", background=[("active", "#4a4a4a")], foreground=[("active", light_text)])
@@ -227,6 +237,11 @@ class FischDesktopApp:
             self.style.map("TCombobox", fieldbackground=[("readonly", "#1f1f1f")], foreground=[("readonly", light_text)])
             self.style.configure("Treeview", background="#232323", foreground=light_text, fieldbackground="#232323")
             self.style.configure("Treeview.Heading", background=muted, foreground=light_text)
+            self.style.map("Treeview.Heading", background=[("active", "#42507a")], foreground=[("active", light_text)])
+            self.root.option_add("*TCombobox*Listbox*Background", "#1f1f1f")
+            self.root.option_add("*TCombobox*Listbox*Foreground", light_text)
+            self.root.option_add("*TCombobox*Listbox*selectBackground", "#42507a")
+            self.root.option_add("*TCombobox*Listbox*selectForeground", light_text)
             self.root.configure(bg=charcoal)
             self.context_menu.configure(background=charcoal, foreground=light_text, activebackground="#4a4a4a", activeforeground=light_text)
         else:
@@ -245,6 +260,11 @@ class FischDesktopApp:
             self.style.map("TCombobox", fieldbackground=[("readonly", "white")], foreground=[("readonly", "black")])
             self.style.configure("Treeview", background="white", foreground="black", fieldbackground="white")
             self.style.configure("Treeview.Heading", background="#e8e8e8", foreground="black")
+            self.style.map("Treeview.Heading", background=[("active", "#a4b4db")], foreground=[("active", "black")])
+            self.root.option_add("*TCombobox*Listbox*Background", "white")
+            self.root.option_add("*TCombobox*Listbox*Foreground", "black")
+            self.root.option_add("*TCombobox*Listbox*selectBackground", "#a4b4db")
+            self.root.option_add("*TCombobox*Listbox*selectForeground", "black")
             self.root.configure(bg="SystemButtonFace")
             self.context_menu.configure(background="SystemButtonFace", foreground="black", activebackground="#d9d9d9", activeforeground="black")
 
@@ -260,6 +280,7 @@ class FischDesktopApp:
                 or q in (rod.get("location") or "").lower()
                 or q in (rod.get("source") or "").lower()
                 or q in (rod.get("stage") or "").lower()
+                or q in (rod.get("level_requirement") or "").lower()
                 or q in (rod.get("durability") or "").lower()
                 or q in (rod.get("disturbance") or "").lower()
                 or q in (rod.get("hunt_focus") or "").lower()
@@ -280,6 +301,24 @@ class FischDesktopApp:
             if "limited" in location:
                 tags.append("limited_location")
             self.tree.insert("", "end", values=row, tags=tuple(tags))
+
+    def sort_by_column(self, column: str) -> None:
+        ascending = self._sort_state.get(column, True)
+        self._sort_state[column] = not ascending
+
+        def key_fn(rod: dict[str, Any]):
+            value = rod.get(column)
+            if isinstance(value, (int, float)):
+                return value
+            if isinstance(value, str):
+                num = self._num(value)
+                if num != 0.0 or value.strip() in {"0", "0.0"}:
+                    return num
+                return value.lower()
+            return float("-inf") if not ascending else float("inf")
+
+        self.filtered_rods.sort(key=key_fn, reverse=not ascending)
+        self._render_tree()
 
     def _update_compare_choices(self) -> None:
         names = [rod.get("name", "") for rod in self.filtered_rods]
@@ -382,6 +421,29 @@ class FischDesktopApp:
         self.tree.selection_set(row_id)
         self.context_menu.post(event.x_root, event.y_root)
 
+    def _on_tree_left_click(self, event) -> None:
+        column_id = self.tree.identify_column(event.x)
+        if not column_id or column_id == "#0":
+            return
+        column_index = int(column_id[1:]) - 1
+        if column_index < 0 or column_index >= len(DISPLAY_COLUMNS):
+            return
+
+        clicked_col = DISPLAY_COLUMNS[column_index]
+        if clicked_col != "passive":
+            self.tree.column("passive", width=self._default_passive_width)
+            return
+
+        row_id = self.tree.identify_row(event.y)
+        if not row_id:
+            return
+        values = self.tree.item(row_id, "values")
+        if not values:
+            return
+        passive_value = str(values[column_index]) if column_index < len(values) else ""
+        target_width = max(self._default_passive_width, min(1200, len(passive_value) * 7))
+        self.tree.column("passive", width=target_width)
+
     def add_selected_row_to_compare(self) -> None:
         selected = self.tree.selection()
         if not selected:
@@ -427,8 +489,18 @@ class FischDesktopApp:
 
     def _display_cell(self, rod: dict[str, Any], col: str) -> str:
         if col == "price":
-            if rod.get("price") is None and "quest" in (rod.get("source") or "").lower():
+            price = rod.get("price")
+            if price is None and "quest" in (rod.get("source") or "").lower():
                 return "quest reward"
+            if isinstance(price, (int, float)):
+                if price >= 1_000_000:
+                    mil = price / 1_000_000
+                    return f"{mil:g} mil"
+                return f"{int(price):,}"
+        if col == "max_kg":
+            max_kg = rod.get("max_kg")
+            if isinstance(max_kg, (int, float)) and max_kg != float("inf"):
+                return f"{int(max_kg):,}"
         return self._fmt(rod.get(col))
 
     @staticmethod

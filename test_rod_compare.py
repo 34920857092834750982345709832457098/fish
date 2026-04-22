@@ -157,6 +157,7 @@ def test_fetch_rod_page_details_extracts_many_fields(monkeypatch):
       <tr><th>Source</th><td>Purchasing</td></tr>
       <tr><th>Price</th><td>15,000C$</td></tr>
       <tr><th>Stage</th><td>Stage 3</td></tr>
+      <tr><th>Level Requirement</th><td>Lvl 35</td></tr>
       <tr><th>Durability</th><td>200 (Lava, Noxious Fluid, Brine)</td></tr>
       <tr><th>Disturbance</th><td>+1</td></tr>
       <tr><th>Hunt Focus</th><td>Brine Storm +5</td></tr>
@@ -182,6 +183,7 @@ def test_fetch_rod_page_details_extracts_many_fields(monkeypatch):
     assert details["source"] == "Purchasing"
     assert details["price"] == "15,000C$"
     assert details["stage"] == "Stage 3"
+    assert details["level_requirement"] == "Lvl 35"
     assert details["durability"].startswith("200")
 
 
