@@ -64,6 +64,7 @@ class FischDesktopApp:
         self.wiki_url_var = tk.StringVar(value=DEFAULT_URL)
         self.search_var = tk.StringVar(value="")
         self.scan_passives_var = tk.BooleanVar(value=True)
+        self.dark_mode_var = tk.BooleanVar(value=False)
 
         self.rods: list[dict[str, Any]] = []
         self.filtered_rods: list[dict[str, Any]] = []
@@ -99,6 +100,8 @@ class FischDesktopApp:
         ttk.Button(top, text="Load Local Index", command=self.load_local_index).grid(
             row=1, column=3, sticky="we", padx=6, pady=4
         )
+        self.dark_mode_button = ttk.Button(top, text="Enable Dark Mode", command=self.toggle_dark_mode)
+        self.dark_mode_button.grid(row=2, column=3, sticky="we", padx=6, pady=4)
 
         top.columnconfigure(1, weight=1)
 
@@ -130,7 +133,7 @@ class FischDesktopApp:
             self.tree.column(col, width=width, stretch=True, anchor="w")
         self.tree.pack(fill="both", expand=True)
         self.tree.bind("<Button-3>", self._on_tree_right_click)
-        self.tree.tag_configure("odd", background="gray", foreground="white")
+        self.tree.tag_configure("odd", background="#a4b4db", foreground="black")
         self.tree.tag_configure("even", background="white", foreground="black")
         self.tree.tag_configure("limited_location", foreground="red")
 
@@ -172,6 +175,7 @@ class FischDesktopApp:
 
         self.context_menu = tk.Menu(self.root, tearoff=0)
         self.context_menu.add_command(label="Add to compare", command=self.add_selected_row_to_compare)
+        self._apply_theme()
 
     def refresh_from_wiki(self) -> None:
         try:
@@ -195,6 +199,23 @@ class FischDesktopApp:
             messagebox.showerror("Load failed", str(exc))
             return
         self.apply_search_filter()
+
+    def toggle_dark_mode(self) -> None:
+        self.dark_mode_var.set(not self.dark_mode_var.get())
+        self.dark_mode_button.configure(text="Disable Dark Mode" if self.dark_mode_var.get() else "Enable Dark Mode")
+        self._apply_theme()
+
+    def _apply_theme(self) -> None:
+        if self.dark_mode_var.get():
+            self.compare_text.configure(bg="#1e1e1e", fg="#f0f0f0", insertbackground="#f0f0f0")
+            self.tree.tag_configure("odd", background="#42507a", foreground="white")
+            self.tree.tag_configure("even", background="#232323", foreground="white")
+            self.root.configure(bg="#121212")
+        else:
+            self.compare_text.configure(bg="white", fg="black", insertbackground="black")
+            self.tree.tag_configure("odd", background="#a4b4db", foreground="black")
+            self.tree.tag_configure("even", background="white", foreground="black")
+            self.root.configure(bg="SystemButtonFace")
 
     def apply_search_filter(self) -> None:
         q = self.search_var.get().strip().lower()

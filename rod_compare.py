@@ -387,11 +387,13 @@ def slugify_wiki_title(title: str) -> str:
 
 
 def extract_passive_from_rod_page(html: str) -> str | None:
-    # Target common wiki table patterns like:
-    # <th>Passive</th><td>...</td>
+    # Target common wiki table and infobox patterns.
     patterns = [
         r"<th[^>]*>\s*Passive\s*</th>\s*<td[^>]*>(.*?)</td>",
         r"<td[^>]*>\s*Passive\s*</td>\s*<td[^>]*>(.*?)</td>",
+        r'data-source=["\']passive["\'][^>]*>.*?(?:pi-data-value|value)[^>]*>(.*?)</',
+        r'class=["\'][^"\']*(?:pi-data-label|label)[^"\']*["\'][^>]*>\s*Passive\s*</[^>]+>\s*<[^>]*class=["\'][^"\']*(?:pi-data-value|value)[^"\']*["\'][^>]*>(.*?)</',
+        r">\s*Passive\s*<.*?>([^<]{3,200})</",
     ]
     for pattern in patterns:
         match = re.search(pattern, html, flags=re.IGNORECASE | re.DOTALL)

@@ -89,6 +89,18 @@ def test_extract_passive_from_rod_page():
     assert extract_passive_from_rod_page(html) == "Tentacle Hit (10% chance)"
 
 
+def test_extract_passive_from_infobox_data_source_markup():
+    html = """
+    <div class="portable-infobox">
+      <div class="pi-item pi-data" data-source="passive">
+        <h3 class="pi-data-label">Passive</h3>
+        <div class="pi-data-value">All fish caught are <b>Frozen (1.5×)</b></div>
+      </div>
+    </div>
+    """
+    assert extract_passive_from_rod_page(html) == "All fish caught are Frozen (1.5×)"
+
+
 def test_enrich_passives_online_with_mock(monkeypatch):
     rods = [Rod(name="Training Rod", source="Merchant", passive="-")]
 
