@@ -69,6 +69,7 @@ python rod_compare.py --input-html Fishing_Rods.html --top 10 --sort luck
 ## Notes
 
 - The script scrapes the table from `https://fischipedia.org/wiki/Fishing_Rods` by default.
+- If direct HTML table parsing fails, the script attempts a MediaWiki raw-text fallback (`?action=raw`).
 - Add `--scan-passives` to fetch each rod's individual wiki page and enrich passive descriptions.
 - If network access to the site is blocked, save the page as HTML in your browser and pass the file via `--input-html`.
 - `--scan-passives` is online-only and cannot be combined with `--input-html`.

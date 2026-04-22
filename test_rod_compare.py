@@ -9,6 +9,7 @@ from rod_compare import (
     map_header_indices,
     parse_number,
     parse_rods_from_html,
+    parse_rods_from_wikitext,
     row_to_rod,
     Rod,
 )
@@ -87,3 +88,19 @@ def test_enrich_passives_online_with_mock(monkeypatch):
     enrich_passives_online(rods, "https://fischipedia.org/wiki/Fishing_Rods")
 
     assert rods[0].passive == "No passive"
+
+
+def test_parse_rods_from_wikitext():
+    raw = """
+    {| class=\"wikitable\"
+    ! Rod !! Source !! Lure Speed !! Luck !! Control !! Resilience !! Max Kg !! Price !! Passive
+    |-
+    | Training Rod || Merchant || 10% || 5 || 0.15 || 8% || 20,000 || C$300 || -
+    |-
+    | Kraken Rod || Quest || 70% || 180 || 0.2 || 15% || 100,000 || C$50,000 || Tentacle Hit
+    |}
+    """
+    rods = parse_rods_from_wikitext(raw)
+    assert len(rods) == 2
+    assert rods[1].name == "Kraken Rod"
+    assert rods[1].passive == "Tentacle Hit"

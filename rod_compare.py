@@ -126,6 +126,52 @@ def parse_number(value: str) -> float | None:
 
 
 def choose_rod_table(tables: list[list[dict[str, list[str]]]]) -> tuple[list[str], list[list[str]]] | None:
+    target_keywords = ["rod", "lure", "luck", "control", "resilience", "max", "price", "passive"]
+    for table in tables:
+        if not table:
+            continue
+        for row_index, row in enumerate(table):
+            header_row = row["cells"]
+            lowered = [h.lower() for h in header_row]
+            joined_headers = " | ".join(lowered)
+
+            score = sum(1 for keyword in target_keywords if keyword in joined_headers)
+            has_rod = "rod" in joined_headers or "name" in joined_headers
+            has_any_stat = any(k in joined_headers for k in ("lure", "luck", "control", "resilience"))
+
+            if has_rod and has_any_stat and score >= 4:
+                rows = [r["cells"] for r in table[row_index + 1 :] if r["cells"]]
+                return header_row, rows
+    return None
+
+
+def parse_rods_from_wikitext(raw_text: str) -> list[Rod]:
+    # Pull only table rows (`| ... || ...`) from wikitext.
+    lines = [line.strip() for line in raw_text.splitlines()]
+    row_lines = [line[1:].strip() for line in lines if line.startswith("|") and "||" in line]
+    if not row_lines:
+        raise RuntimeError("Could not find rod rows in raw wiki text.")
+
+    # Build headers from the first `!` row when available.
+    header_lines = [line[1:].strip() for line in lines if line.startswith("!") and "!!" in line]
+    if header_lines:
+        headers = [normalize_space(part) for part in header_lines[0].split("!!")]
+    else:
+        headers = ["Rod", "Source", "Lure Speed", "Luck", "Control", "Resilience", "Max Kg", "Price", "Passive"]
+
+    idx = map_header_indices(headers)
+    rods: list[Rod] = []
+    for line in row_lines:
+        cells = [normalize_space(c) for c in line.split("||")]
+        rod = row_to_rod(cells, idx)
+        if rod:
+            rods.append(rod)
+
+    if not rods:
+        raise RuntimeError("Raw wiki text was found, but no rod rows were parsed.")
+    return rods
+
+
     required = {"rod", "lure", "luck", "control", "resilience"}
     for table in tables:
         if not table:
@@ -227,6 +273,20 @@ def fetch_rods(url: str) -> list[Rod]:
     except URLError as exc:
         raise RuntimeError(f"Could not reach {url}: {exc.reason}") from exc
 
+    try:
+        return parse_rods_from_html(html)
+    except RuntimeError:
+        # Fallback: many MediaWiki pages expose stable raw markup.
+        raw_url = f"{url}?action=raw"
+        raw_req = Request(raw_url, headers={"User-Agent": "rod-compare-bot/1.0"})
+        try:
+            with urlopen(raw_req, timeout=30) as response:
+                raw_text = response.read().decode("utf-8", errors="replace")
+        except (HTTPError, URLError) as exc:
+            raise RuntimeError(
+                "Could not find a fishing-rod stats table in HTML and raw wiki fallback failed."
+            ) from exc
+        return parse_rods_from_wikitext(raw_text)
     return parse_rods_from_html(html)
 
 
