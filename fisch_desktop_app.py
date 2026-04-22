@@ -9,6 +9,7 @@ Suggested architecture implemented:
 
 from __future__ import annotations
 
+import re
 import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk
@@ -81,12 +82,26 @@ class FischDesktopApp:
         self._default_passive_width = 200
         self._sort_state: dict[str, bool] = {}
         self._passive_popup: tk.Toplevel | None = None
+        self._compare_all_names: list[str] = []
 
         self._build_ui()
         self.search_var.trace_add("write", lambda *_: self.apply_search_filter())
 
     def _build_ui(self) -> None:
-        top = ttk.Frame(self.root, padding=10)
+        notebook = ttk.Notebook(self.root)
+        notebook.pack(fill="both", expand=True)
+
+        rods_tab = ttk.Frame(notebook)
+        xp_tab = ttk.Frame(notebook)
+        gold_tab = ttk.Frame(notebook)
+        notebook.add(rods_tab, text="Rods")
+        notebook.add(xp_tab, text="XP")
+        notebook.add(gold_tab, text="Gold")
+
+        ttk.Label(xp_tab, text="XP tab coming next.").pack(anchor="center", pady=20)
+        ttk.Label(gold_tab, text="Gold tab coming next.").pack(anchor="center", pady=20)
+
+        top = ttk.Frame(rods_tab, padding=10)
         top.pack(fill="x")
 
         ttk.Label(top, text="Wiki URL:").grid(row=0, column=0, sticky="w", padx=4, pady=4)
@@ -112,7 +127,7 @@ class FischDesktopApp:
 
         top.columnconfigure(1, weight=1)
 
-        middle = ttk.Frame(self.root, padding=(10, 0, 10, 10))
+        middle = ttk.Frame(rods_tab, padding=(10, 0, 10, 10))
         middle.pack(fill="both", expand=True)
 
         search_row = ttk.Frame(middle)
@@ -154,14 +169,16 @@ class FischDesktopApp:
         self.tree.configure(yscrollcommand=scroll_y.set)
         scroll_y.pack(side="right", fill="y")
 
-        compare_box = ttk.LabelFrame(self.root, text="Compare Rods", padding=10)
+        compare_box = ttk.LabelFrame(rods_tab, text="Compare Rods", padding=10)
         compare_box.pack(fill="x", padx=10, pady=(0, 10))
 
         for i in range(self.max_compare_slots):
             label = ttk.Label(compare_box, text=f"Compare Slot {i + 1}:")
             label.grid(row=i, column=0, sticky="w", padx=4, pady=2)
-            combo = ttk.Combobox(compare_box, textvariable=self.compare_choice_vars[i], width=45, state="readonly")
+            combo = ttk.Combobox(compare_box, textvariable=self.compare_choice_vars[i], width=45, state="normal")
             combo.grid(row=i, column=1, sticky="we", padx=4, pady=2)
+            combo.bind("<KeyRelease>", lambda event, idx=i: self._filter_compare_options(idx))
+            combo.bind("<<ComboboxSelected>>", lambda event, idx=i: self._finalize_compare_selection(idx))
             if i >= self.visible_compare_slots:
                 combo.grid_remove()
                 label.grid_remove()
@@ -322,8 +339,23 @@ class FischDesktopApp:
         self.filtered_rods.sort(key=key_fn, reverse=not ascending)
         self._render_tree()
 
+    def _filter_compare_options(self, index: int) -> None:
+        query = self.compare_choice_vars[index].get().strip().lower()
+        if not query:
+            self.compare_combos[index]["values"] = self._compare_all_names
+            return
+        filtered = [name for name in self._compare_all_names if query in name.lower()]
+        self.compare_combos[index]["values"] = filtered
+
+    def _finalize_compare_selection(self, index: int) -> None:
+        chosen = self.compare_choice_vars[index].get().strip()
+        if chosen not in self._compare_all_names:
+            self.compare_choice_vars[index].set("")
+        self.compare_combos[index]["values"] = self._compare_all_names
+
     def _update_compare_choices(self) -> None:
         names = [rod.get("name", "") for rod in self.filtered_rods]
+        self._compare_all_names = names[:]
         for combo in self.compare_combos:
             combo["values"] = names
 
@@ -353,17 +385,14 @@ class FischDesktopApp:
         names_csv = ", ".join(rod["name"] for rod in selected_rods)
         self.compare_text.delete("1.0", "end")
         self.compare_text.insert("end", f"Comparing: {names_csv}\n\n")
-        self.compare_text.insert("end", "Passives:\n", ("category",))
-        for idx, rod in enumerate(selected_rods):
-            rod_tag = f"rod_{idx % self.max_compare_slots}"
-            self.compare_text.insert("end", f"- {rod['name']}: ", (rod_tag,))
-            self.compare_text.insert("end", f"{rod.get('passive') or '-'}\n")
-        self.compare_text.insert("end", "\n")
 
         score = {rod["name"]: 0 for rod in selected_rods}
 
         for stat in COMPARE_STATS:
-            values = [(rod["name"], self._num(rod.get(stat))) for rod in selected_rods]
+            values = [
+                (rod["name"], self._num(rod.get(stat)) + self._passive_stat_bonus(rod, stat))
+                for rod in selected_rods
+            ]
             best_value = max(v for _, v in values)
             winners = [name for name, value in values if value == best_value]
             for winner in winners:
@@ -551,6 +580,32 @@ class FischDesktopApp:
             return float(value)
         except (TypeError, ValueError):
             return 0.0
+
+    def _passive_stat_bonus(self, rod: dict[str, Any], stat: str) -> float:
+        passive = (rod.get("passive") or "").lower()
+        if not passive:
+            return 0.0
+        keywords = {
+            "lure_speed": ["lure speed", "lure"],
+            "luck": ["luck"],
+            "control": ["control"],
+            "resilience": ["resilience"],
+            "max_kg": [],
+            "price": [],
+        }
+        total = 0.0
+        for keyword in keywords.get(stat, []):
+            patterns = [
+                rf"([+-]\d+(?:\.\d+)?)\s*%?\s*{re.escape(keyword)}",
+                rf"{re.escape(keyword)}\s*(?:by|to)?\s*([+-]\d+(?:\.\d+)?)",
+            ]
+            for pattern in patterns:
+                for match in re.finditer(pattern, passive):
+                    try:
+                        total += float(match.group(1))
+                    except (TypeError, ValueError):
+                        continue
+        return total
 
 
 def main() -> None:
