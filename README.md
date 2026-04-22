@@ -22,6 +22,11 @@ or
 python fisch_desktop_app.py
 ```
 
+Desktop compare tips:
+- Starts with 2 compare slots.
+- Right-click a rod row and choose **Add to compare** to add more rods (third slot appears when needed).
+- In comparison output, best-per-stat is highlighted in green and overall best is highlighted in blue.
+
 ## Windows 11 quick start
 
 Open **PowerShell** in the folder where you saved these files, then run:

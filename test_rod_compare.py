@@ -6,9 +6,6 @@ from rod_compare import (
     extract_passive_from_rod_page,
     enrich_rod_details_online,
     fetch_rod_page_details,
-    choose_rod_table,
-    extract_passive_from_rod_page,
-    enrich_passives_online,
     load_rods_from_local_html,
     map_header_indices,
     parse_number,
@@ -47,9 +44,6 @@ def test_extract_and_convert_rows():
     selected = choose_rod_tables(parser.tables)
     assert selected
     headers, rows = selected[0]
-    selected = choose_rod_table(parser.tables)
-    assert selected is not None
-    headers, rows = selected
 
     idx = map_header_indices(headers)
     rods = [row_to_rod(row, idx) for row in rows]
@@ -107,12 +101,6 @@ def test_enrich_passives_online_with_mock(monkeypatch):
     assert rods[0].passive == "No passive"
     assert rods[0].stage == "Stage 3"
     assert rods[0].line_distance == "20m"
-        return "No passive"
-
-    monkeypatch.setattr("rod_compare.fetch_rod_page_passive", fake_fetch)
-    enrich_passives_online(rods, "https://fischipedia.org/wiki/Fishing_Rods")
-
-    assert rods[0].passive == "No passive"
 
 
 def test_parse_rods_from_wikitext():

@@ -32,7 +32,6 @@ DISPLAY_COLUMNS = [
     "line_distance",
     "passive",
     "location",
-    "passive",
     "source",
 ]
 
@@ -51,7 +50,6 @@ COLUMN_TITLES = {
     "line_distance": "Line Distance",
     "passive": "Passive",
     "location": "Location",
-    "passive": "Passive",
     "source": "Source",
 }
 
@@ -72,8 +70,11 @@ class FischDesktopApp:
         self.rods: list[dict[str, Any]] = []
         self.filtered_rods: list[dict[str, Any]] = []
 
-        self.left_choice_var = tk.StringVar(value="")
-        self.right_choice_var = tk.StringVar(value="")
+        self.max_compare_slots = 6
+        self.compare_choice_vars = [tk.StringVar(value="") for _ in range(self.max_compare_slots)]
+        self.compare_combos: list[ttk.Combobox] = []
+        self.compare_labels: list[ttk.Label] = []
+        self.visible_compare_slots = 2
 
         self._build_ui()
         self.search_var.trace_add("write", lambda *_: self.apply_search_filter())
@@ -111,7 +112,6 @@ class FischDesktopApp:
         ttk.Label(search_row, text="Search:").pack(side="left")
         ttk.Entry(search_row, textvariable=self.search_var, width=40).pack(side="left", padx=8)
         ttk.Label(search_row, text="(name, location, source, passive)").pack(side="left")
-        ttk.Label(search_row, text="(name, source, passive)").pack(side="left")
 
         self.tree = ttk.Treeview(middle, columns=DISPLAY_COLUMNS, show="headings", height=16)
         for col in DISPLAY_COLUMNS:
@@ -131,6 +131,7 @@ class FischDesktopApp:
                 width = 180
             self.tree.column(col, width=width, stretch=True, anchor="w")
         self.tree.pack(fill="both", expand=True)
+        self.tree.bind("<Button-3>", self._on_tree_right_click)
 
         scroll_y = ttk.Scrollbar(self.tree, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll_y.set)
@@ -139,21 +140,30 @@ class FischDesktopApp:
         compare_box = ttk.LabelFrame(self.root, text="Compare Rods", padding=10)
         compare_box.pack(fill="x", padx=10, pady=(0, 10))
 
-        ttk.Label(compare_box, text="Left Rod:").grid(row=0, column=0, sticky="w", padx=4, pady=4)
-        self.left_combo = ttk.Combobox(compare_box, textvariable=self.left_choice_var, width=35, state="readonly")
-        self.left_combo.grid(row=0, column=1, sticky="w", padx=4, pady=4)
+        for i in range(self.max_compare_slots):
+            label = ttk.Label(compare_box, text=f"Compare Slot {i + 1}:")
+            label.grid(row=i, column=0, sticky="w", padx=4, pady=2)
+            combo = ttk.Combobox(compare_box, textvariable=self.compare_choice_vars[i], width=45, state="readonly")
+            combo.grid(row=i, column=1, sticky="we", padx=4, pady=2)
+            if i >= self.visible_compare_slots:
+                combo.grid_remove()
+                label.grid_remove()
+            self.compare_labels.append(label)
+            self.compare_combos.append(combo)
 
-        ttk.Label(compare_box, text="Right Rod:").grid(row=0, column=2, sticky="w", padx=4, pady=4)
-        self.right_combo = ttk.Combobox(compare_box, textvariable=self.right_choice_var, width=35, state="readonly")
-        self.right_combo.grid(row=0, column=3, sticky="w", padx=4, pady=4)
+        controls_row = self.max_compare_slots
+        ttk.Button(compare_box, text="Compare", command=self.compare_selected).grid(row=controls_row, column=0, padx=4, pady=6, sticky="w")
+        ttk.Button(compare_box, text="Reset Slots", command=self.reset_compare_slots).grid(row=controls_row, column=1, padx=4, pady=6, sticky="w")
 
-        ttk.Button(compare_box, text="Compare", command=self.compare_selected).grid(row=0, column=4, padx=8)
-
-        self.compare_text = tk.Text(compare_box, height=9, wrap="word")
-        self.compare_text.grid(row=1, column=0, columnspan=5, sticky="we", padx=4, pady=(8, 4))
+        self.compare_text = tk.Text(compare_box, height=12, wrap="word")
+        self.compare_text.grid(row=controls_row + 1, column=0, columnspan=2, sticky="we", padx=4, pady=(8, 4))
+        self.compare_text.tag_configure("best_stat", foreground="green")
+        self.compare_text.tag_configure("overall_best", foreground="blue")
 
         compare_box.columnconfigure(1, weight=1)
-        compare_box.columnconfigure(3, weight=1)
+
+        self.context_menu = tk.Menu(self.root, tearoff=0)
+        self.context_menu.add_command(label="Add to compare", command=self.add_selected_row_to_compare)
 
     def refresh_from_wiki(self) -> None:
         try:
@@ -194,7 +204,6 @@ class FischDesktopApp:
                 or q in (rod.get("disturbance") or "").lower()
                 or q in (rod.get("hunt_focus") or "").lower()
                 or q in (rod.get("line_distance") or "").lower()
-                or q in (rod.get("source") or "").lower()
                 or q in (rod.get("passive") or "").lower()
             ]
 
@@ -211,47 +220,127 @@ class FischDesktopApp:
 
     def _update_compare_choices(self) -> None:
         names = [rod.get("name", "") for rod in self.filtered_rods]
-        self.left_combo["values"] = names
-        self.right_combo["values"] = names
+        for combo in self.compare_combos:
+            combo["values"] = names
 
-        if names:
-            if self.left_choice_var.get() not in names:
-                self.left_choice_var.set(names[0])
-            if self.right_choice_var.get() not in names:
-                self.right_choice_var.set(names[min(1, len(names) - 1)])
-        else:
-            self.left_choice_var.set("")
-            self.right_choice_var.set("")
-
-    def compare_selected(self) -> None:
-        left = self._find_rod(self.left_choice_var.get())
-        right = self._find_rod(self.right_choice_var.get())
-        if not left or not right:
-            messagebox.showwarning("Missing selection", "Please select two rods to compare.")
+        if not names:
+            for var in self.compare_choice_vars:
+                var.set("")
             return
 
-        lines = [
-            f"Comparing: {left['name']}  vs  {right['name']}",
-            "",
-            f"Passive (left):  {left.get('passive') or '-'}",
-            f"Passive (right): {right.get('passive') or '-'}",
-            "",
-        ]
+        for i in range(self.visible_compare_slots):
+            current = self.compare_choice_vars[i].get()
+            if current not in names:
+                self.compare_choice_vars[i].set(names[min(i, len(names) - 1)])
+
+    def compare_selected(self) -> None:
+        selected_names = [var.get() for var in self.compare_choice_vars[: self.visible_compare_slots] if var.get()]
+        unique_names = []
+        for name in selected_names:
+            if name not in unique_names:
+                unique_names.append(name)
+
+        selected_rods = [self._find_rod(name) for name in unique_names]
+        selected_rods = [rod for rod in selected_rods if rod is not None]
+        if len(selected_rods) < 2:
+            messagebox.showwarning("Missing selection", "Please select at least two rods to compare.")
+            return
+
+        names_csv = ", ".join(rod["name"] for rod in selected_rods)
+        self.compare_text.delete("1.0", "end")
+        self.compare_text.insert("end", f"Comparing: {names_csv}\n\n")
+        self.compare_text.insert("end", "Passives:\n")
+        for rod in selected_rods:
+            self.compare_text.insert("end", f"- {rod['name']}: {rod.get('passive') or '-'}\n")
+        self.compare_text.insert("end", "\n")
+
+        score = {rod["name"]: 0 for rod in selected_rods}
 
         for stat in COMPARE_STATS:
-            lv = self._num(left.get(stat))
-            rv = self._num(right.get(stat))
-            delta = lv - rv
-            if delta > 0:
-                winner = left["name"]
-            elif delta < 0:
-                winner = right["name"]
-            else:
-                winner = "Tie"
-            lines.append(f"{COLUMN_TITLES[stat]}: {lv:g} vs {rv:g}  | Δ={delta:+g} | Winner: {winner}")
+            values = [(rod["name"], self._num(rod.get(stat))) for rod in selected_rods]
+            best_value = max(v for _, v in values)
+            winners = [name for name, value in values if value == best_value]
+            for winner in winners:
+                score[winner] += 1
 
-        self.compare_text.delete("1.0", "end")
-        self.compare_text.insert("1.0", "\n".join(lines))
+            value_text = " | ".join(f"{name}: {value:g}" for name, value in values)
+            winner_text = "Tie" if len(winners) != 1 else winners[0]
+
+            line_start = self.compare_text.index("end-1c")
+            line = f"{COLUMN_TITLES[stat]} -> {value_text} | Best: {winner_text}\n"
+            self.compare_text.insert("end", line)
+
+            if len(winners) == 1:
+                offset = line.rfind(winner_text)
+                if offset >= 0:
+                    tag_start = f"{line_start}+{offset}c"
+                    tag_end = f"{tag_start}+{len(winner_text)}c"
+                    self.compare_text.tag_add("best_stat", tag_start, tag_end)
+
+        best_score = max(score.values())
+        overall = [name for name, val in score.items() if val == best_score]
+        overall_text = ", ".join(overall)
+        line_start = self.compare_text.index("end-1c")
+        summary = f"\nOverall best: {overall_text} (wins: {best_score})\n"
+        self.compare_text.insert("end", summary)
+        offset = summary.rfind(overall_text)
+        if offset >= 0:
+            tag_start = f"{line_start}+{offset}c"
+            tag_end = f"{tag_start}+{len(overall_text)}c"
+            self.compare_text.tag_add("overall_best", tag_start, tag_end)
+
+    def reset_compare_slots(self) -> None:
+        self.visible_compare_slots = 2
+        for i, combo in enumerate(self.compare_combos):
+            label = self._get_compare_label_widget(i)
+            if i < self.visible_compare_slots:
+                combo.grid()
+                label.grid()
+            else:
+                combo.grid_remove()
+                label.grid_remove()
+            if i >= self.visible_compare_slots:
+                self.compare_choice_vars[i].set("")
+        self._update_compare_choices()
+
+    def _get_compare_label_widget(self, index: int):
+        return self.compare_labels[index]
+
+    def _on_tree_right_click(self, event) -> None:
+        row_id = self.tree.identify_row(event.y)
+        if not row_id:
+            return
+        self.tree.selection_set(row_id)
+        self.context_menu.post(event.x_root, event.y_root)
+
+    def add_selected_row_to_compare(self) -> None:
+        selected = self.tree.selection()
+        if not selected:
+            return
+        values = self.tree.item(selected[0], "values")
+        if not values:
+            return
+        rod_name = values[0]
+
+        for i in range(self.visible_compare_slots):
+            if self.compare_choice_vars[i].get() == rod_name:
+                return
+
+        target = None
+        for i in range(self.visible_compare_slots):
+            if not self.compare_choice_vars[i].get():
+                target = i
+                break
+        if target is None:
+            if self.visible_compare_slots < self.max_compare_slots:
+                target = self.visible_compare_slots
+                self.visible_compare_slots += 1
+                self.compare_combos[target].grid()
+                self._get_compare_label_widget(target).grid()
+            else:
+                target = self.max_compare_slots - 1
+
+        self.compare_choice_vars[target].set(rod_name)
 
     def _find_rod(self, name: str) -> dict[str, Any] | None:
         for rod in self.rods:

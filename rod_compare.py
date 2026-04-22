@@ -134,8 +134,6 @@ def parse_number(value: str) -> float | None:
 def choose_rod_tables(tables: list[list[dict[str, list[str]]]]) -> list[tuple[list[str], list[list[str]]]]:
     target_keywords = ["rod", "lure", "luck", "control", "resilience", "max", "price", "passive"]
     matches: list[tuple[list[str], list[list[str]]]] = []
-def choose_rod_table(tables: list[list[dict[str, list[str]]]]) -> tuple[list[str], list[list[str]]] | None:
-    target_keywords = ["rod", "lure", "luck", "control", "resilience", "max", "price", "passive"]
     for table in tables:
         if not table:
             continue
@@ -153,8 +151,6 @@ def choose_rod_table(tables: list[list[dict[str, list[str]]]]) -> tuple[list[str
                 matches.append((header_row, rows))
                 break
     return matches
-                return header_row, rows
-    return None
 
 
 def parse_rods_from_wikitext(raw_text: str) -> list[Rod]:
@@ -182,23 +178,6 @@ def parse_rods_from_wikitext(raw_text: str) -> list[Rod]:
     if not rods:
         raise RuntimeError("Raw wiki text was found, but no rod rows were parsed.")
     return rods
-
-
-    required = {"rod", "lure", "luck", "control", "resilience"}
-    for table in tables:
-        if not table:
-            continue
-        header_row = table[0]["cells"]
-        lowered = [h.lower() for h in header_row]
-        if required.issubset(" ".join(lowered).split()):
-            rows = [r["cells"] for r in table[1:] if r["cells"]]
-            return header_row, rows
-
-        joined_headers = " | ".join(lowered)
-        if all(k in joined_headers for k in required):
-            rows = [r["cells"] for r in table[1:] if r["cells"]]
-            return header_row, rows
-    return None
 
 
 def map_header_indices(headers: list[str]) -> dict[str, int]:
@@ -257,9 +236,6 @@ def row_to_rod(row: list[str], idx: dict[str, int]) -> Rod | None:
         source=source_text,
         location=location_text,
         stage=get("stage") or None,
-    return Rod(
-        name=name,
-        source=get("source"),
         lure_speed=parse_number(get("lure_speed")),
         luck=parse_number(get("luck")),
         control=parse_number(get("control")),
@@ -270,7 +246,6 @@ def row_to_rod(row: list[str], idx: dict[str, int]) -> Rod | None:
         disturbance=get("disturbance") or None,
         hunt_focus=get("hunt_focus") or None,
         line_distance=get("line_distance") or None,
-        price=parse_number(get("price")),
         passive=get("passive") or None,
     )
 
@@ -319,18 +294,6 @@ def parse_rods_from_html(html: str) -> list[Rod]:
             if rod and rod.name.lower() not in seen_names:
                 rods.append(rod)
                 seen_names.add(rod.name.lower())
-    selected = choose_rod_table(parser.tables)
-    if not selected:
-        raise RuntimeError("Could not find a fishing-rod stats table on the page.")
-
-    headers, rows = selected
-    indices = map_header_indices(headers)
-
-    rods: list[Rod] = []
-    for row in rows:
-        rod = row_to_rod(row, indices)
-        if rod:
-            rods.append(rod)
 
     if not rods:
         raise RuntimeError("Table was found, but no rod rows were parsed.")
@@ -361,7 +324,6 @@ def fetch_rods(url: str) -> list[Rod]:
                 "Could not find a fishing-rod stats table in HTML and raw wiki fallback failed."
             ) from exc
         return parse_rods_from_wikitext(raw_text)
-    return parse_rods_from_html(html)
 
 
 def load_rods_from_local_html(path: str) -> list[Rod]:
@@ -446,7 +408,6 @@ def normalize_rod_detail_fields(fields: dict[str, str]) -> dict[str, str]:
 
 
 def fetch_rod_page_details(rod_name: str, wiki_base: str) -> dict[str, str]:
-def fetch_rod_page_passive(rod_name: str, wiki_base: str) -> str | None:
     rod_url = f"{wiki_base}/wiki/{slugify_wiki_title(rod_name)}"
     req = Request(rod_url, headers={"User-Agent": "rod-compare-bot/1.0"})
     try:
@@ -499,16 +460,6 @@ def enrich_rod_details_online(rods: list[Rod], fishing_rods_url: str) -> None:
             rod.line_distance = details["line_distance"]
         if details.get("passive"):
             rod.passive = details["passive"]
-        return None
-    return extract_passive_from_rod_page(html)
-
-
-def enrich_passives_online(rods: list[Rod], fishing_rods_url: str) -> None:
-    wiki_base = wiki_base_from_url(fishing_rods_url)
-    for rod in rods:
-        fetched = fetch_rod_page_passive(rod.name, wiki_base)
-        if fetched:
-            rod.passive = fetched
 
 
 def filter_rods(rods: Iterable[Rod], names: list[str] | None) -> list[Rod]:
@@ -540,7 +491,6 @@ def print_table(rods: list[Rod]) -> None:
         "Location",
         "Source",
     ]
-    headers = ["Rod", "Lure", "Luck", "Control", "Resilience", "MaxKg", "Price", "Passive", "Source"]
     rows = [
         [
             rod.name,
@@ -557,7 +507,6 @@ def print_table(rods: list[Rod]) -> None:
             rod.line_distance or "-",
             rod.passive or "-",
             rod.location or "-",
-            rod.passive or "-",
             rod.source,
         ]
         for rod in rods
@@ -601,7 +550,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--scan-passives",
         action="store_true",
         help="Online mode only: fetch each rod's wiki page and enrich passive and detailed rod factors.",
-        help="Online mode only: fetch each rod's wiki page and enrich/overwrite passive data.",
     )
     return parser.parse_args(argv)
 
@@ -624,7 +572,6 @@ def main(argv: list[str]) -> int:
 
     if args.scan_passives:
         enrich_rod_details_online(rods, args.url)
-        enrich_passives_online(rods, args.url)
 
     rods = filter_rods(rods, args.rods)
     if not rods:
