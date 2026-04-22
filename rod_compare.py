@@ -41,6 +41,13 @@ class Rod:
     passive: str | None = None
 
 
+DURABILITY_BONUS_MAP = {
+    100: "Lava",
+    150: "Lava, Noxious Fluid",
+    200: "Lava, Noxious Fluid, Brine",
+}
+
+
 class WikiTableParser(HTMLParser):
     """Extract table rows from HTML, preserving enough structure for stat parsing."""
 
@@ -124,6 +131,9 @@ def strip_tags(value: str) -> str:
 def parse_number(value: str) -> float | None:
     if not value:
         return None
+    lowered = value.lower().strip()
+    if "infinite" in lowered or lowered in {"inf", "∞"}:
+        return float("inf")
     cleaned = value.replace(",", "")
     match = re.search(r"-?\d+(?:\.\d+)?", cleaned)
     if not match:
@@ -231,6 +241,8 @@ def row_to_rod(row: list[str], idx: dict[str, int]) -> Rod | None:
         parse_number(get("price")),
     )
 
+    disturbance, hunt_focus = split_disturbance_and_focus(get("disturbance"), get("hunt_focus"))
+
     return Rod(
         name=name,
         source=source_text,
@@ -242,9 +254,9 @@ def row_to_rod(row: list[str], idx: dict[str, int]) -> Rod | None:
         resilience=parse_number(get("resilience")),
         max_kg=parse_number(get("max_kg")),
         price=price_value,
-        durability=get("durability") or None,
-        disturbance=get("disturbance") or None,
-        hunt_focus=get("hunt_focus") or None,
+        durability=normalize_durability_text(get("durability") or None),
+        disturbance=disturbance,
+        hunt_focus=hunt_focus,
         line_distance=get("line_distance") or None,
         passive=get("passive") or None,
     )
@@ -275,6 +287,30 @@ def split_source_location_price(
             source_clean = right.strip()
 
     return source_clean, location_clean, price_clean
+
+
+def split_disturbance_and_focus(
+    disturbance_text: str,
+    hunt_focus_text: str,
+) -> tuple[str | None, str | None]:
+    disturbance_clean = disturbance_text.strip() or None
+    hunt_focus_clean = hunt_focus_text.strip() or None
+    if disturbance_clean:
+        match = re.match(r"^([+-]?\d+(?:\.\d+)?)\s+(.+)$", disturbance_clean)
+        if match and re.search(r"[A-Za-z]", match.group(2)):
+            disturbance_clean = match.group(1)
+            if not hunt_focus_clean:
+                hunt_focus_clean = match.group(2).strip()
+    return disturbance_clean, hunt_focus_clean
+
+
+def normalize_durability_text(value: str | None) -> str | None:
+    if not value:
+        return None
+    numeric = parse_number(value)
+    if numeric is None:
+        return value
+    return DURABILITY_BONUS_MAP.get(int(numeric), value)
 
 
 def parse_rods_from_html(html: str) -> list[Rod]:
@@ -451,11 +487,12 @@ def enrich_rod_details_online(rods: list[Rod], fishing_rods_url: str) -> None:
             if parsed_price is not None:
                 rod.price = parsed_price
         if details.get("durability"):
-            rod.durability = details["durability"]
+            rod.durability = normalize_durability_text(details["durability"])
         if details.get("disturbance"):
             rod.disturbance = details["disturbance"]
         if details.get("hunt_focus"):
             rod.hunt_focus = details["hunt_focus"]
+        rod.disturbance, rod.hunt_focus = split_disturbance_and_focus(rod.disturbance or "", rod.hunt_focus or "")
         if details.get("line_distance"):
             rod.line_distance = details["line_distance"]
         if details.get("passive"):
@@ -486,7 +523,6 @@ def print_table(rods: list[Rod]) -> None:
         "Durability",
         "Disturbance",
         "Hunt Focus",
-        "Line Distance",
         "Passive",
         "Location",
         "Source",
@@ -499,12 +535,11 @@ def print_table(rods: list[Rod]) -> None:
             fmt(rod.control),
             fmt(rod.resilience),
             fmt(rod.max_kg),
-            fmt(rod.price),
+            fmt_price(rod.price, rod.source),
             rod.stage or "-",
             rod.durability or "-",
             rod.disturbance or "-",
             rod.hunt_focus or "-",
-            rod.line_distance or "-",
             rod.passive or "-",
             rod.location or "-",
             rod.source,
@@ -527,7 +562,19 @@ def print_table(rods: list[Rod]) -> None:
 
 
 def fmt(value: float | None) -> str:
-    return "-" if value is None else f"{value:g}"
+    if value is None:
+        return "-"
+    if value == float("inf"):
+        return "inf."
+    return f"{value:g}"
+
+
+def fmt_price(value: float | None, source: str) -> str:
+    if value is not None:
+        return fmt(value)
+    if "quest" in source.lower():
+        return "quest reward"
+    return "-"
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:

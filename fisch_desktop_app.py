@@ -29,7 +29,6 @@ DISPLAY_COLUMNS = [
     "durability",
     "disturbance",
     "hunt_focus",
-    "line_distance",
     "passive",
     "location",
     "source",
@@ -47,7 +46,6 @@ COLUMN_TITLES = {
     "durability": "Durability",
     "disturbance": "Disturbance",
     "hunt_focus": "Hunt Focus",
-    "line_distance": "Line Distance",
     "passive": "Passive",
     "location": "Location",
     "source": "Source",
@@ -116,22 +114,25 @@ class FischDesktopApp:
         self.tree = ttk.Treeview(middle, columns=DISPLAY_COLUMNS, show="headings", height=16)
         for col in DISPLAY_COLUMNS:
             self.tree.heading(col, text=COLUMN_TITLES[col])
-            width = 120
+            width = 85
             if col == "name":
-                width = 180
+                width = 135
             elif col == "passive":
-                width = 260
+                width = 200
             elif col == "location":
-                width = 180
+                width = 110
             elif col == "durability":
-                width = 200
+                width = 150
             elif col == "hunt_focus":
-                width = 200
+                width = 130
             elif col == "source":
-                width = 180
+                width = 95
             self.tree.column(col, width=width, stretch=True, anchor="w")
         self.tree.pack(fill="both", expand=True)
         self.tree.bind("<Button-3>", self._on_tree_right_click)
+        self.tree.tag_configure("odd", background="black", foreground="white")
+        self.tree.tag_configure("even", background="white", foreground="black")
+        self.tree.tag_configure("limited_location", foreground="red")
 
         scroll_y = ttk.Scrollbar(self.tree, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scroll_y.set)
@@ -159,6 +160,13 @@ class FischDesktopApp:
         self.compare_text.grid(row=controls_row + 1, column=0, columnspan=2, sticky="we", padx=4, pady=(8, 4))
         self.compare_text.tag_configure("best_stat", foreground="green")
         self.compare_text.tag_configure("overall_best", foreground="blue")
+        self.compare_text.tag_configure("category", font=("TkDefaultFont", 9, "bold"))
+        self.compare_text.tag_configure("rod_0", foreground="purple")
+        self.compare_text.tag_configure("rod_1", foreground="orange")
+        self.compare_text.tag_configure("rod_2", foreground="teal")
+        self.compare_text.tag_configure("rod_3", foreground="brown")
+        self.compare_text.tag_configure("rod_4", foreground="magenta")
+        self.compare_text.tag_configure("rod_5", foreground="navy")
 
         compare_box.columnconfigure(1, weight=1)
 
@@ -203,7 +211,6 @@ class FischDesktopApp:
                 or q in (rod.get("durability") or "").lower()
                 or q in (rod.get("disturbance") or "").lower()
                 or q in (rod.get("hunt_focus") or "").lower()
-                or q in (rod.get("line_distance") or "").lower()
                 or q in (rod.get("passive") or "").lower()
             ]
 
@@ -214,9 +221,13 @@ class FischDesktopApp:
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        for rod in self.filtered_rods:
-            row = [self._fmt(rod.get(col)) for col in DISPLAY_COLUMNS]
-            self.tree.insert("", "end", values=row)
+        for idx, rod in enumerate(self.filtered_rods):
+            row = [self._display_cell(rod, col) for col in DISPLAY_COLUMNS]
+            tags = ["odd" if idx % 2 == 0 else "even"]
+            location = (rod.get("location") or "").lower()
+            if "limited" in location:
+                tags.append("limited_location")
+            self.tree.insert("", "end", values=row, tags=tuple(tags))
 
     def _update_compare_choices(self) -> None:
         names = [rod.get("name", "") for rod in self.filtered_rods]
@@ -231,7 +242,7 @@ class FischDesktopApp:
         for i in range(self.visible_compare_slots):
             current = self.compare_choice_vars[i].get()
             if current not in names:
-                self.compare_choice_vars[i].set(names[min(i, len(names) - 1)])
+                self.compare_choice_vars[i].set("")
 
     def compare_selected(self) -> None:
         selected_names = [var.get() for var in self.compare_choice_vars[: self.visible_compare_slots] if var.get()]
@@ -249,9 +260,11 @@ class FischDesktopApp:
         names_csv = ", ".join(rod["name"] for rod in selected_rods)
         self.compare_text.delete("1.0", "end")
         self.compare_text.insert("end", f"Comparing: {names_csv}\n\n")
-        self.compare_text.insert("end", "Passives:\n")
-        for rod in selected_rods:
-            self.compare_text.insert("end", f"- {rod['name']}: {rod.get('passive') or '-'}\n")
+        self.compare_text.insert("end", "Passives:\n", ("category",))
+        for idx, rod in enumerate(selected_rods):
+            rod_tag = f"rod_{idx % self.max_compare_slots}"
+            self.compare_text.insert("end", f"- {rod['name']}: ", (rod_tag,))
+            self.compare_text.insert("end", f"{rod.get('passive') or '-'}\n")
         self.compare_text.insert("end", "\n")
 
         score = {rod["name"]: 0 for rod in selected_rods}
@@ -263,11 +276,15 @@ class FischDesktopApp:
             for winner in winners:
                 score[winner] += 1
 
-            value_text = " | ".join(f"{name}: {value:g}" for name, value in values)
             winner_text = "Tie" if len(winners) != 1 else winners[0]
-
+            self.compare_text.insert("end", f"{COLUMN_TITLES[stat]}: ", ("category",))
+            for idx, (_, value) in enumerate(values):
+                rod_tag = f"rod_{idx % self.max_compare_slots}"
+                self.compare_text.insert("end", f"{value:g}", (rod_tag,))
+                if idx != len(values) - 1:
+                    self.compare_text.insert("end", " | ")
             line_start = self.compare_text.index("end-1c")
-            line = f"{COLUMN_TITLES[stat]} -> {value_text} | Best: {winner_text}\n"
+            line = f" | Best: {winner_text}\n"
             self.compare_text.insert("end", line)
 
             if len(winners) == 1:
@@ -352,7 +369,15 @@ class FischDesktopApp:
     def _fmt(value: Any) -> str:
         if value is None or value == "":
             return "-"
+        if isinstance(value, float) and value == float("inf"):
+            return "inf."
         return str(value)
+
+    def _display_cell(self, rod: dict[str, Any], col: str) -> str:
+        if col == "price":
+            if rod.get("price") is None and "quest" in (rod.get("source") or "").lower():
+                return "quest reward"
+        return self._fmt(rod.get(col))
 
     @staticmethod
     def _num(value: Any) -> float:
