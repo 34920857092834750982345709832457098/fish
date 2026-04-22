@@ -328,13 +328,13 @@ class FischDesktopApp:
         def key_fn(rod: dict[str, Any]):
             value = rod.get(column)
             if isinstance(value, (int, float)):
-                return value
+                return (0, float(value))
             if isinstance(value, str):
                 num = self._num(value)
                 if num != 0.0 or value.strip() in {"0", "0.0"}:
-                    return num
-                return value.lower()
-            return float("-inf") if not ascending else float("inf")
+                    return (0, num)
+                return (1, value.lower())
+            return (2, "")
 
         self.filtered_rods.sort(key=key_fn, reverse=not ascending)
         self._render_tree()
