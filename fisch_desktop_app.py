@@ -13,7 +13,7 @@ import re
 import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk
-from typing import Any
+from typing import Any, Callable
 
 from rod_compare import DEFAULT_URL
 from wiki_index import DEFAULT_INDEX_FILE, load_index, refresh_index
@@ -159,6 +159,12 @@ XP_ENCHANT_MULTIPLIERS = {
     "Wise (+35%)": 1.35,
 }
 
+MUTATION_MULTIPLIERS = {
+    "shiny": 1.20,
+    "sparkling": 1.55,
+    "mythic": 2.25,
+}
+
 GOLD_ENCHANT_MULTIPLIERS = {
     "None": 1.0,
     "Greedy (+10%)": 1.10,
@@ -200,16 +206,16 @@ class FischDesktopApp:
         self.rods: list[dict[str, Any]] = []
         self.filtered_rods: list[dict[str, Any]] = []
         self.location_names = sorted(LOCATION_AVERAGES.keys())
-        self._xp_rod_options = ["No bonus rod"]
-        self._gold_rod_options = ["No bonus rod"]
+        self._xp_rod_options = ["No xp bonus on rod"]
+        self._gold_rod_options: list[str] = []
 
         self.xp_location_var = tk.StringVar(value=self.location_names[0] if self.location_names else "")
-        self.xp_rod_var = tk.StringVar(value="No bonus rod")
+        self.xp_rod_var = tk.StringVar(value="No xp bonus on rod")
         self.xp_enchant_var = tk.StringVar(value="None")
         self.xp_result_var = tk.StringVar(value="Adjusted XP: -")
 
         self.gold_location_var = tk.StringVar(value=self.location_names[0] if self.location_names else "")
-        self.gold_rod_var = tk.StringVar(value="No bonus rod")
+        self.gold_rod_var = tk.StringVar(value="")
         self.gold_enchant_var = tk.StringVar(value="None")
         self.gold_mutation_profile_var = tk.StringVar(value="Balanced")
         self.gold_result_var = tk.StringVar(value="Adjusted Gold: -")
@@ -223,6 +229,8 @@ class FischDesktopApp:
         self._sort_state: dict[str, bool] = {}
         self._passive_popup: tk.Toplevel | None = None
         self._compare_all_names: list[str] = []
+        self._xp_avg_sort_ascending = True
+        self._gold_avg_sort_ascending = True
 
         self._build_ui()
         self.search_var.trace_add("write", lambda *_: self.apply_search_filter())
@@ -361,7 +369,10 @@ class FischDesktopApp:
         columns = ("location", "average")
         tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=24)
         tree.heading("location", text="Location")
-        tree.heading("average", text="Average")
+        if mode == "xp":
+            tree.heading("average", text="Average XP ▲", command=lambda: self._sort_average_tree("xp"))
+        else:
+            tree.heading("average", text="Average Gold ▲", command=lambda: self._sort_average_tree("gold"))
         tree.column("location", width=230, stretch=True, anchor="w")
         tree.column("average", width=120, stretch=False, anchor="e")
         tree.pack(fill="both", expand=True)
@@ -383,17 +394,17 @@ class FischDesktopApp:
 
     def _build_xp_calculator(self, frame: ttk.LabelFrame) -> None:
         ttk.Label(frame, text="Rod").grid(row=0, column=0, sticky="w", pady=4)
-        self.xp_rod_combo = ttk.Combobox(frame, textvariable=self.xp_rod_var, values=self._xp_rod_options, state="readonly", width=30)
+        self.xp_rod_combo = ttk.Combobox(frame, textvariable=self.xp_rod_var, values=self._xp_rod_options, state="normal", width=30)
         self.xp_rod_combo.grid(row=1, column=0, sticky="we", pady=(0, 8))
         ttk.Label(frame, text="Location").grid(row=0, column=1, sticky="w", padx=(12, 0), pady=4)
         self.xp_location_combo = ttk.Combobox(
-            frame, textvariable=self.xp_location_var, values=self.location_names, state="readonly", width=30
+            frame, textvariable=self.xp_location_var, values=self.location_names, state="normal", width=30
         )
         self.xp_location_combo.grid(row=1, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
 
         ttk.Label(frame, text="Enchant").grid(row=2, column=0, sticky="w", pady=4)
         self.xp_enchant_combo = ttk.Combobox(
-            frame, textvariable=self.xp_enchant_var, values=list(XP_ENCHANT_MULTIPLIERS.keys()), state="readonly", width=30
+            frame, textvariable=self.xp_enchant_var, values=list(XP_ENCHANT_MULTIPLIERS.keys()), state="normal", width=30
         )
         self.xp_enchant_combo.grid(row=3, column=0, sticky="we", pady=(0, 8))
         ttk.Button(frame, text="Calculate XP", command=self.calculate_xp).grid(row=3, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
@@ -406,17 +417,20 @@ class FischDesktopApp:
         self.xp_location_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
         self.xp_rod_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
         self.xp_enchant_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
+        self._bind_filtering(self.xp_rod_combo, lambda: self._xp_rod_options, self.calculate_xp)
+        self._bind_filtering(self.xp_location_combo, self.location_names, self.calculate_xp)
+        self._bind_filtering(self.xp_enchant_combo, list(XP_ENCHANT_MULTIPLIERS.keys()), self.calculate_xp)
         self.calculate_xp()
 
     def _build_gold_calculator(self, frame: ttk.LabelFrame) -> None:
         ttk.Label(frame, text="Rod").grid(row=0, column=0, sticky="w", pady=4)
         self.gold_rod_combo = ttk.Combobox(
-            frame, textvariable=self.gold_rod_var, values=self._gold_rod_options, state="readonly", width=30
+            frame, textvariable=self.gold_rod_var, values=self._gold_rod_options, state="normal", width=30
         )
         self.gold_rod_combo.grid(row=1, column=0, sticky="we", pady=(0, 8))
         ttk.Label(frame, text="Location").grid(row=0, column=1, sticky="w", padx=(12, 0), pady=4)
         self.gold_location_combo = ttk.Combobox(
-            frame, textvariable=self.gold_location_var, values=self.location_names, state="readonly", width=30
+            frame, textvariable=self.gold_location_var, values=self.location_names, state="normal", width=30
         )
         self.gold_location_combo.grid(row=1, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
 
@@ -425,7 +439,7 @@ class FischDesktopApp:
             frame,
             textvariable=self.gold_enchant_var,
             values=list(GOLD_ENCHANT_MULTIPLIERS.keys()),
-            state="readonly",
+            state="normal",
             width=30,
         )
         self.gold_enchant_combo.grid(row=3, column=0, sticky="we", pady=(0, 8))
@@ -435,7 +449,7 @@ class FischDesktopApp:
             frame,
             textvariable=self.gold_mutation_profile_var,
             values=list(MUTATION_PROFILES.keys()),
-            state="readonly",
+            state="normal",
             width=30,
         )
         self.gold_mutation_combo.grid(row=5, column=0, sticky="we", pady=(0, 8))
@@ -450,6 +464,10 @@ class FischDesktopApp:
         self.gold_rod_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_gold())
         self.gold_enchant_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_gold())
         self.gold_mutation_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_gold())
+        self._bind_filtering(self.gold_rod_combo, lambda: self._gold_rod_options, self.calculate_gold)
+        self._bind_filtering(self.gold_location_combo, self.location_names, self.calculate_gold)
+        self._bind_filtering(self.gold_enchant_combo, list(GOLD_ENCHANT_MULTIPLIERS.keys()), self.calculate_gold)
+        self._bind_filtering(self.gold_mutation_combo, list(MUTATION_PROFILES.keys()), self.calculate_gold)
         self.calculate_gold()
 
     def refresh_from_wiki(self) -> None:
@@ -827,6 +845,41 @@ class FischDesktopApp:
         except (TypeError, ValueError):
             return 0.0
 
+    def _bind_filtering(self, combo: ttk.Combobox, options: list[str] | Callable[[], list[str]], on_change) -> None:
+        def resolve_options() -> list[str]:
+            return options() if callable(options) else options
+
+        def filter_values(*_) -> None:
+            query = combo.get().strip().lower()
+            all_options = resolve_options()
+            values = all_options if not query else [opt for opt in all_options if query in opt.lower()]
+            combo["values"] = values
+
+        combo.bind("<KeyRelease>", filter_values)
+        combo.bind("<FocusIn>", filter_values)
+        combo.bind("<FocusOut>", lambda *_: on_change())
+
+    def _sort_average_tree(self, mode: str) -> None:
+        tree = self.xp_locations_tree if mode == "xp" else self.gold_locations_tree
+        rows = []
+        for item in tree.get_children():
+            loc, avg = tree.item(item, "values")
+            rows.append((loc, float(str(avg).replace(",", ""))))
+        ascending = self._xp_avg_sort_ascending if mode == "xp" else self._gold_avg_sort_ascending
+        rows.sort(key=lambda row: row[1], reverse=not ascending)
+        for item in tree.get_children():
+            tree.delete(item)
+        for loc, avg in rows:
+            tree.insert("", "end", values=(loc, f"{avg:,.2f}"))
+        if mode == "xp":
+            self._xp_avg_sort_ascending = not ascending
+            arrow = "▲" if self._xp_avg_sort_ascending else "▼"
+            tree.heading("average", text=f"Average XP {arrow}", command=lambda: self._sort_average_tree("xp"))
+        else:
+            self._gold_avg_sort_ascending = not ascending
+            arrow = "▲" if self._gold_avg_sort_ascending else "▼"
+            tree.heading("average", text=f"Average Gold {arrow}", command=lambda: self._sort_average_tree("gold"))
+
     def _expected_multiplier(self, profile_name: str) -> float:
         profile = MUTATION_PROFILES.get(profile_name, MUTATION_PROFILES["None"])
         return sum(entry["chance"] * entry["multiplier"] for entry in profile)
@@ -837,50 +890,96 @@ class FischDesktopApp:
         total = 0.0
         lowered = text.lower()
         for keyword in keywords:
-            for match in re.finditer(rf"([+-]?\d+(?:\.\d+)?)\s*%[^.]*{re.escape(keyword)}", lowered):
+            patterns = [
+                rf"([+-]?\d+(?:\.\d+)?)\s*%[^.]*{re.escape(keyword)}",
+                rf"{re.escape(keyword)}[^.]*?([+-]?\d+(?:\.\d+)?)\s*%",
+            ]
+            for pattern in patterns:
+                for match in re.finditer(pattern, lowered):
+                    try:
+                        total += float(match.group(1))
+                    except ValueError:
+                        continue
+        return total
+
+    def _extract_xp_multiplier_bonus(self, text: str) -> float:
+        if not text:
+            return 0.0
+        total = 0.0
+        lowered = text.lower()
+        patterns = [
+            r"([0-9]+(?:\.[0-9]+)?)x\s*(?:xp|exp|experience)",
+            r"(?:xp|exp|experience)[^.]*?([0-9]+(?:\.[0-9]+)?)x",
+        ]
+        for pattern in patterns:
+            for match in re.finditer(pattern, lowered):
                 try:
-                    total += float(match.group(1))
+                    mult = float(match.group(1))
+                    if mult > 0:
+                        total += (mult - 1.0) * 100.0
                 except ValueError:
                     continue
         return total
 
+    def _mutation_expected_multiplier_from_passive(self, text: str) -> float:
+        if not text:
+            return 1.0
+        lowered = text.lower()
+        weighted_bonus = 0.0
+        total_chance = 0.0
+        for mutation, multiplier in MUTATION_MULTIPLIERS.items():
+            for match in re.finditer(rf"(\d+(?:\.\d+)?)\s*%[^.]*{re.escape(mutation)}", lowered):
+                chance = float(match.group(1)) / 100.0
+                if chance <= 0:
+                    continue
+                total_chance += chance
+                weighted_bonus += chance * multiplier
+        if total_chance <= 0:
+            return 1.0
+        residual = max(0.0, 1.0 - total_chance)
+        return residual + weighted_bonus
+
     def _rod_xp_bonus_multiplier(self, rod_name: str) -> float:
-        if rod_name == "No bonus rod":
+        if rod_name == "No xp bonus on rod":
             return 1.0
         rod = self._find_rod(rod_name)
         if not rod:
             return 1.0
-        bonus = self._extract_percent_bonus((rod.get("passive") or ""), ["xp", "experience"])
+        passive = rod.get("passive") or ""
+        bonus = self._extract_percent_bonus(passive, ["xp", "exp", "experience"])
+        bonus += self._extract_xp_multiplier_bonus(passive)
         return 1.0 + (bonus / 100.0)
 
     def _rod_gold_bonus_multiplier(self, rod_name: str) -> float:
-        if rod_name == "No bonus rod":
+        if not rod_name:
             return 1.0
         rod = self._find_rod(rod_name)
         if not rod:
             return 1.0
-        bonus = self._extract_percent_bonus((rod.get("passive") or ""), ["sell value", "value", "gold", "coins"])
-        return 1.0 + (bonus / 100.0)
+        passive = rod.get("passive") or ""
+        bonus = self._extract_percent_bonus(passive, ["sell value", "value", "gold", "coins", "cash", "c$"])
+        mutation_bonus = self._mutation_expected_multiplier_from_passive(passive)
+        return (1.0 + (bonus / 100.0)) * mutation_bonus
 
     def _update_calculator_rod_choices(self) -> None:
         names = sorted((rod.get("name") or "") for rod in self.rods if rod.get("name"))
-        self._gold_rod_options = ["No bonus rod", *names]
+        self._gold_rod_options = names
         xp_names = []
         for rod in self.rods:
             passive = (rod.get("passive") or "").lower()
-            if "xp" in passive or "experience" in passive:
+            if "xp" in passive or "experience" in passive or "exp" in passive:
                 if rod.get("name"):
                     xp_names.append(rod["name"])
-        self._xp_rod_options = ["No bonus rod", *sorted(set(xp_names))]
+        self._xp_rod_options = ["No xp bonus on rod", *sorted(set(xp_names))]
 
         if hasattr(self, "gold_rod_combo"):
             self.gold_rod_combo["values"] = self._gold_rod_options
             if self.gold_rod_var.get() not in self._gold_rod_options:
-                self.gold_rod_var.set("No bonus rod")
+                self.gold_rod_var.set(self._gold_rod_options[0] if self._gold_rod_options else "")
         if hasattr(self, "xp_rod_combo"):
             self.xp_rod_combo["values"] = self._xp_rod_options
             if self.xp_rod_var.get() not in self._xp_rod_options:
-                self.xp_rod_var.set("No bonus rod")
+                self.xp_rod_var.set("No xp bonus on rod")
         self.calculate_xp()
         self.calculate_gold()
 
