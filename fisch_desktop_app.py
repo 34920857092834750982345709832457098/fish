@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 import tkinter as tk
+import json
 from pathlib import Path
 from tkinter import messagebox, ttk
 from typing import Any, Callable
@@ -221,7 +222,9 @@ class FischDesktopApp:
         self.wiki_url_var = tk.StringVar(value=DEFAULT_URL)
         self.search_var = tk.StringVar(value="")
         self.scan_passives_var = tk.BooleanVar(value=True)
-        self.dark_mode_var = tk.BooleanVar(value=False)
+        self.settings_path = Path.home() / ".fisch_desktop_settings.json"
+        settings = self._load_settings()
+        self.dark_mode_var = tk.BooleanVar(value=bool(settings.get("dark_mode", False)))
 
         self.rods: list[dict[str, Any]] = []
         self.filtered_rods: list[dict[str, Any]] = []
@@ -257,6 +260,7 @@ class FischDesktopApp:
 
         self._build_ui()
         self.search_var.trace_add("write", lambda *_: self.apply_search_filter())
+        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _build_ui(self) -> None:
         notebook = ttk.Notebook(self.root)
@@ -294,6 +298,7 @@ class FischDesktopApp:
         )
         self.dark_mode_button = ttk.Button(top, text="Enable Dark Mode", command=self.toggle_dark_mode)
         self.dark_mode_button.grid(row=2, column=3, sticky="we", padx=6, pady=4)
+        self.dark_mode_button.configure(text="Disable Dark Mode" if self.dark_mode_var.get() else "Enable Dark Mode")
 
         top.columnconfigure(1, weight=1)
 
@@ -543,6 +548,26 @@ class FischDesktopApp:
         self.dark_mode_var.set(not self.dark_mode_var.get())
         self.dark_mode_button.configure(text="Disable Dark Mode" if self.dark_mode_var.get() else "Enable Dark Mode")
         self._apply_theme()
+        self._save_settings()
+
+    def _load_settings(self) -> dict[str, Any]:
+        try:
+            if self.settings_path.exists():
+                return json.loads(self.settings_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+        return {}
+
+    def _save_settings(self) -> None:
+        payload = {"dark_mode": bool(self.dark_mode_var.get())}
+        try:
+            self.settings_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        except Exception:
+            pass
+
+    def _on_close(self) -> None:
+        self._save_settings()
+        self.root.destroy()
 
     def _apply_theme(self) -> None:
         self._hide_passive_popup()
@@ -904,13 +929,17 @@ class FischDesktopApp:
         def filter_values(*_) -> None:
             query = combo.get().strip().lower()
             all_options = resolve_options()
-            values = all_options if not query else [opt for opt in all_options if query in opt.lower()]
+            if not query:
+                values = all_options
+            else:
+                values = [opt for opt in all_options if opt.lower().startswith(query)]
+                if not values:
+                    values = [opt for opt in all_options if query in opt.lower()]
             combo["values"] = values
-            if values:
-                combo.event_generate("<Down>")
 
         combo.bind("<KeyRelease>", filter_values)
         combo.bind("<FocusIn>", filter_values)
+        combo.bind("<Button-1>", filter_values)
         combo.bind("<FocusOut>", lambda *_: on_change())
 
     def _sort_average_tree(self, mode: str) -> None:
@@ -1123,6 +1152,12 @@ class FischDesktopApp:
         except ValueError:
             self.xp_needed_result_var.set("XP needed: invalid level input")
             return
+        if current > 2000:
+            current = 2000
+            self.xp_current_level_var.set("2000")
+        if target > 2000:
+            target = 2000
+            self.xp_target_level_var.set("2000")
         needed = self._xp_between_levels(current, target)
         self.xp_needed_result_var.set(f"XP needed: {needed:,}")
 
