@@ -159,20 +159,37 @@ XP_ENCHANT_MULTIPLIERS = {
     "Wise (+35%)": 1.35,
 }
 
+ENCHANT_CATALOG = {
+    "None": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Abyssal": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Blessed": {"xp_multiplier": 1.0, "luck": 15.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Breezed": {"xp_multiplier": 1.0, "luck": 5.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Clever": {"xp_multiplier": 2.25, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Controlled": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Divine": {"xp_multiplier": 1.0, "luck": 45.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Greedy": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.10, "gold_events": []},
+    "Hasty": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Insight": {"xp_multiplier": 1.50, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Lucky": {"xp_multiplier": 1.0, "luck": 20.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Mutated": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": [{"chance": 0.10, "multiplier": 8.0}]},
+    "Noir": {"xp_multiplier": 1.0, "luck": 35.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Opulent": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.35, "gold_events": []},
+    "Prosperous": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.20, "gold_events": []},
+    "Quantum": {"xp_multiplier": 1.0, "luck": 25.0, "gold_multiplier": 1.0, "gold_events": [{"chance": 0.05, "multiplier": 12.0}]},
+    "Steady": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Storming": {"xp_multiplier": 1.0, "luck": 10.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Swift": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Unbreakable": {"xp_multiplier": 1.0, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+    "Wormhole": {"xp_multiplier": 1.0, "luck": 30.0, "gold_multiplier": 1.0, "gold_events": [{"chance": 0.08, "multiplier": 8.0}]},
+    "Wise": {"xp_multiplier": 1.30, "luck": 0.0, "gold_multiplier": 1.0, "gold_events": []},
+}
+
+ENCHANT_OPTIONS = sorted(ENCHANT_CATALOG.keys())
+
 MUTATION_MULTIPLIERS = {
     "shiny": 1.20,
     "sparkling": 1.55,
     "mythic": 2.25,
-}
-
-GOLD_ENCHANT_EFFECTS = {
-    "None": {"gold_multiplier": 1.0, "events": []},
-    "Greedy (+10% value)": {"gold_multiplier": 1.10, "events": []},
-    "Prosperous (+20% value)": {"gold_multiplier": 1.20, "events": []},
-    "Opulent (+35% value)": {"gold_multiplier": 1.35, "events": []},
-    "Aureate (20% for 4x)": {"gold_multiplier": 1.0, "events": [{"chance": 0.20, "multiplier": 4.0}]},
-    "Prismatic (10% for 8x)": {"gold_multiplier": 1.0, "events": [{"chance": 0.10, "multiplier": 8.0}]},
-    "Chaotic (5% for 12x)": {"gold_multiplier": 1.0, "events": [{"chance": 0.05, "multiplier": 12.0}]},
 }
 
 MUTATION_PROFILES = {
@@ -216,6 +233,9 @@ class FischDesktopApp:
         self.xp_rod_var = tk.StringVar(value="No xp bonus on rod")
         self.xp_enchant_var = tk.StringVar(value="None")
         self.xp_result_var = tk.StringVar(value="Adjusted XP: -")
+        self.xp_current_level_var = tk.StringVar(value="1")
+        self.xp_target_level_var = tk.StringVar(value="2")
+        self.xp_needed_result_var = tk.StringVar(value="XP needed: -")
 
         self.gold_location_var = tk.StringVar(value=self.location_names[0] if self.location_names else "")
         self.gold_rod_var = tk.StringVar(value="")
@@ -396,69 +416,92 @@ class FischDesktopApp:
             self._build_gold_calculator(calculator_frame)
 
     def _build_xp_calculator(self, frame: ttk.LabelFrame) -> None:
-        ttk.Label(frame, text="Rod").grid(row=0, column=0, sticky="w", pady=4)
-        self.xp_rod_combo = ttk.Combobox(frame, textvariable=self.xp_rod_var, values=self._xp_rod_options, state="normal", width=30)
-        self.xp_rod_combo.grid(row=1, column=0, sticky="we", pady=(0, 8))
-        ttk.Label(frame, text="Location").grid(row=0, column=1, sticky="w", padx=(12, 0), pady=4)
-        self.xp_location_combo = ttk.Combobox(
-            frame, textvariable=self.xp_location_var, values=self.location_names, state="normal", width=30
-        )
-        self.xp_location_combo.grid(row=1, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
+        top_calc = ttk.LabelFrame(frame, text="XP per Catch Calculator", padding=14)
+        top_calc.grid(row=0, column=0, sticky="nsew")
+        bottom_calc = ttk.LabelFrame(frame, text="XP Needed (Level Target)", padding=14)
+        bottom_calc.grid(row=1, column=0, sticky="nsew", pady=(16, 0))
 
-        ttk.Label(frame, text="Enchant").grid(row=2, column=0, sticky="w", pady=4)
-        self.xp_enchant_combo = ttk.Combobox(
-            frame, textvariable=self.xp_enchant_var, values=list(XP_ENCHANT_MULTIPLIERS.keys()), state="normal", width=30
+        ttk.Label(top_calc, text="Rod").grid(row=0, column=0, sticky="w", pady=6)
+        self.xp_rod_combo = ttk.Combobox(top_calc, textvariable=self.xp_rod_var, values=self._xp_rod_options, state="normal", width=34)
+        self.xp_rod_combo.grid(row=1, column=0, sticky="we", pady=(0, 10))
+        ttk.Label(top_calc, text="Location").grid(row=0, column=1, sticky="w", padx=(16, 0), pady=6)
+        self.xp_location_combo = ttk.Combobox(
+            top_calc, textvariable=self.xp_location_var, values=self.location_names, state="normal", width=34
         )
-        self.xp_enchant_combo.grid(row=3, column=0, sticky="we", pady=(0, 8))
-        ttk.Button(frame, text="Calculate XP", command=self.calculate_xp).grid(row=3, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
-        ttk.Label(frame, textvariable=self.xp_result_var, font=("TkDefaultFont", 10, "bold")).grid(
-            row=4, column=0, columnspan=2, sticky="w", pady=(8, 0)
+        self.xp_location_combo.grid(row=1, column=1, sticky="we", padx=(16, 0), pady=(0, 10))
+
+        ttk.Label(top_calc, text="Enchant").grid(row=2, column=0, sticky="w", pady=6)
+        self.xp_enchant_combo = ttk.Combobox(
+            top_calc, textvariable=self.xp_enchant_var, values=ENCHANT_OPTIONS, state="normal", width=34
+        )
+        self.xp_enchant_combo.grid(row=3, column=0, sticky="we", pady=(0, 10))
+        ttk.Button(top_calc, text="Calculate XP", command=self.calculate_xp).grid(row=3, column=1, sticky="we", padx=(16, 0), pady=(0, 10))
+        ttk.Label(top_calc, textvariable=self.xp_result_var, font=("TkDefaultFont", 12, "bold")).grid(
+            row=4, column=0, columnspan=2, sticky="w", pady=(10, 0)
+        )
+
+        ttk.Label(bottom_calc, text="Current level").grid(row=0, column=0, sticky="w", pady=6)
+        ttk.Entry(bottom_calc, textvariable=self.xp_current_level_var, width=16).grid(row=1, column=0, sticky="w", pady=(0, 10))
+        ttk.Label(bottom_calc, text="Desired level").grid(row=0, column=1, sticky="w", padx=(16, 0), pady=6)
+        ttk.Entry(bottom_calc, textvariable=self.xp_target_level_var, width=16).grid(row=1, column=1, sticky="w", padx=(16, 0), pady=(0, 10))
+        ttk.Button(bottom_calc, text="Calculate XP Needed", command=self.calculate_xp_needed).grid(
+            row=2, column=0, columnspan=2, sticky="we", pady=(0, 8)
+        )
+        ttk.Label(bottom_calc, textvariable=self.xp_needed_result_var, font=("TkDefaultFont", 12, "bold")).grid(
+            row=3, column=0, columnspan=2, sticky="w", pady=(8, 0)
         )
 
         frame.columnconfigure(0, weight=1)
-        frame.columnconfigure(1, weight=1)
+        frame.rowconfigure(0, weight=1)
+        top_calc.columnconfigure(0, weight=1)
+        top_calc.columnconfigure(1, weight=1)
+        bottom_calc.columnconfigure(0, weight=1)
+        bottom_calc.columnconfigure(1, weight=1)
         self.xp_location_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
         self.xp_rod_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
         self.xp_enchant_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
         self._bind_filtering(self.xp_rod_combo, lambda: self._xp_rod_options, self.calculate_xp)
         self._bind_filtering(self.xp_location_combo, self.location_names, self.calculate_xp)
-        self._bind_filtering(self.xp_enchant_combo, list(XP_ENCHANT_MULTIPLIERS.keys()), self.calculate_xp)
+        self._bind_filtering(self.xp_enchant_combo, ENCHANT_OPTIONS, self.calculate_xp)
+        self.xp_current_level_var.trace_add("write", lambda *_: self.calculate_xp_needed())
+        self.xp_target_level_var.trace_add("write", lambda *_: self.calculate_xp_needed())
         self.calculate_xp()
+        self.calculate_xp_needed()
 
     def _build_gold_calculator(self, frame: ttk.LabelFrame) -> None:
-        ttk.Label(frame, text="Rod").grid(row=0, column=0, sticky="w", pady=4)
+        ttk.Label(frame, text="Rod").grid(row=0, column=0, sticky="w", pady=6)
         self.gold_rod_combo = ttk.Combobox(
-            frame, textvariable=self.gold_rod_var, values=self._gold_rod_options, state="normal", width=30
+            frame, textvariable=self.gold_rod_var, values=self._gold_rod_options, state="normal", width=34
         )
-        self.gold_rod_combo.grid(row=1, column=0, sticky="we", pady=(0, 8))
-        ttk.Label(frame, text="Location").grid(row=0, column=1, sticky="w", padx=(12, 0), pady=4)
+        self.gold_rod_combo.grid(row=1, column=0, sticky="we", pady=(0, 10))
+        ttk.Label(frame, text="Location").grid(row=0, column=1, sticky="w", padx=(16, 0), pady=6)
         self.gold_location_combo = ttk.Combobox(
-            frame, textvariable=self.gold_location_var, values=self.location_names, state="normal", width=30
+            frame, textvariable=self.gold_location_var, values=self.location_names, state="normal", width=34
         )
-        self.gold_location_combo.grid(row=1, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
+        self.gold_location_combo.grid(row=1, column=1, sticky="we", padx=(16, 0), pady=(0, 10))
 
-        ttk.Label(frame, text="Enchant").grid(row=2, column=0, sticky="w", pady=4)
+        ttk.Label(frame, text="Enchant").grid(row=2, column=0, sticky="w", pady=6)
         self.gold_enchant_combo = ttk.Combobox(
             frame,
             textvariable=self.gold_enchant_var,
-            values=list(GOLD_ENCHANT_EFFECTS.keys()),
+            values=ENCHANT_OPTIONS,
             state="normal",
-            width=30,
+            width=34,
         )
-        self.gold_enchant_combo.grid(row=3, column=0, sticky="we", pady=(0, 8))
+        self.gold_enchant_combo.grid(row=3, column=0, sticky="we", pady=(0, 10))
 
-        ttk.Label(frame, text="Mutation profile").grid(row=4, column=0, sticky="w", pady=4)
+        ttk.Label(frame, text="Mutation profile").grid(row=4, column=0, sticky="w", pady=6)
         self.gold_mutation_combo = ttk.Combobox(
             frame,
             textvariable=self.gold_mutation_profile_var,
             values=list(MUTATION_PROFILES.keys()),
             state="normal",
-            width=30,
+            width=34,
         )
-        self.gold_mutation_combo.grid(row=5, column=0, sticky="we", pady=(0, 8))
-        ttk.Button(frame, text="Calculate Gold", command=self.calculate_gold).grid(row=5, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
-        ttk.Label(frame, textvariable=self.gold_result_var, font=("TkDefaultFont", 10, "bold")).grid(
-            row=6, column=0, columnspan=2, sticky="w", pady=(8, 0)
+        self.gold_mutation_combo.grid(row=5, column=0, sticky="we", pady=(0, 10))
+        ttk.Button(frame, text="Calculate Gold", command=self.calculate_gold).grid(row=5, column=1, sticky="we", padx=(16, 0), pady=(0, 10))
+        ttk.Label(frame, textvariable=self.gold_result_var, font=("TkDefaultFont", 12, "bold")).grid(
+            row=6, column=0, columnspan=2, sticky="w", pady=(10, 0)
         )
 
         frame.columnconfigure(0, weight=1)
@@ -469,7 +512,7 @@ class FischDesktopApp:
         self.gold_mutation_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_gold())
         self._bind_filtering(self.gold_rod_combo, lambda: self._gold_rod_options, self.calculate_gold)
         self._bind_filtering(self.gold_location_combo, self.location_names, self.calculate_gold)
-        self._bind_filtering(self.gold_enchant_combo, list(GOLD_ENCHANT_EFFECTS.keys()), self.calculate_gold)
+        self._bind_filtering(self.gold_enchant_combo, ENCHANT_OPTIONS, self.calculate_gold)
         self._bind_filtering(self.gold_mutation_combo, list(MUTATION_PROFILES.keys()), self.calculate_gold)
         self.calculate_gold()
 
@@ -594,6 +637,12 @@ class FischDesktopApp:
 
         def key_fn(rod: dict[str, Any]):
             value = rod.get(column)
+            if column == "level_requirement":
+                text = str(value or "")
+                match = re.search(r"(\d[\d,]*)", text)
+                if match:
+                    return (0, float(match.group(1).replace(",", "")))
+                return (2, float("inf"))
             if isinstance(value, (int, float)):
                 return (0, float(value))
             if isinstance(value, str):
@@ -857,6 +906,8 @@ class FischDesktopApp:
             all_options = resolve_options()
             values = all_options if not query else [opt for opt in all_options if query in opt.lower()]
             combo["values"] = values
+            if values:
+                combo.event_generate("<Down>")
 
         combo.bind("<KeyRelease>", filter_values)
         combo.bind("<FocusIn>", filter_values)
@@ -967,11 +1018,47 @@ class FischDesktopApp:
         return events
 
     def _enchant_gold_multiplier(self, enchant_name: str) -> float:
-        effect = GOLD_ENCHANT_EFFECTS.get(enchant_name, {"gold_multiplier": 1.0, "events": []})
+        effect = ENCHANT_CATALOG.get(enchant_name, {"gold_multiplier": 1.0, "gold_events": []})
         base = float(effect.get("gold_multiplier", 1.0))
-        events = list(effect.get("events", []))
+        events = list(effect.get("gold_events", []))
         events.extend(self._parse_chance_multiplier_pairs(enchant_name))
         return base * self._expected_multiplier_from_events(events)
+
+    def _enchant_luck_bonus(self, enchant_name: str) -> float:
+        return float(ENCHANT_CATALOG.get(enchant_name, {}).get("luck", 0.0))
+
+    def _enchant_xp_multiplier(self, enchant_name: str) -> float:
+        if enchant_name in XP_ENCHANT_MULTIPLIERS:
+            return XP_ENCHANT_MULTIPLIERS[enchant_name]
+        return float(ENCHANT_CATALOG.get(enchant_name, {}).get("xp_multiplier", 1.0))
+
+    def _luck_xp_multiplier(self, luck_percent: float) -> float:
+        if luck_percent <= 0:
+            return 1.0
+        low_weight = 0.60
+        high_weight = 0.40
+        low_xp = 60.0
+        high_xp = 850.0
+        baseline = (low_weight * low_xp) + (high_weight * high_xp)
+        low_scaled = low_weight * max(0.0, 1.0 - (luck_percent / 1000.0))
+        high_scaled = high_weight * (1.0 + (luck_percent / 100.0))
+        norm = low_scaled + high_scaled
+        if norm <= 0:
+            return 1.0
+        weighted = ((low_scaled * low_xp) + (high_scaled * high_xp)) / norm
+        return weighted / baseline
+
+    def _xp_between_levels(self, current_level: int, desired_level: int) -> int:
+        if desired_level <= current_level:
+            return 0
+        total = 0
+        for level in range(current_level, desired_level):
+            requirement = 190 * max(1, level)
+            if level >= 1001:
+                tier = ((level - 1001) // 500) + 1
+                requirement *= 2 ** tier
+            total += requirement
+        return total
 
     def _rod_xp_bonus_multiplier(self, rod_name: str) -> float:
         if rod_name == "No xp bonus on rod":
@@ -1020,12 +1107,24 @@ class FischDesktopApp:
     def calculate_xp(self) -> None:
         location = self.xp_location_var.get()
         base_xp = LOCATION_AVERAGES.get(location, {}).get("avg_xp", 0.0)
-        enchant_multiplier = XP_ENCHANT_MULTIPLIERS.get(self.xp_enchant_var.get(), 1.0)
+        enchant_name = self.xp_enchant_var.get()
+        enchant_multiplier = self._enchant_xp_multiplier(enchant_name)
         rod_multiplier = self._rod_xp_bonus_multiplier(self.xp_rod_var.get())
-        adjusted = base_xp * enchant_multiplier * rod_multiplier
-        self.xp_result_var.set(
-            f"Adjusted XP: {adjusted:,.2f}  (base {base_xp:,.2f} × rod {rod_multiplier:.3f} × enchant {enchant_multiplier:.3f})"
-        )
+        rod = self._find_rod(self.xp_rod_var.get()) if self.xp_rod_var.get() != "No xp bonus on rod" else None
+        rod_luck = self._num((rod or {}).get("luck"))
+        luck_multiplier = self._luck_xp_multiplier(rod_luck + self._enchant_luck_bonus(enchant_name))
+        adjusted = base_xp * enchant_multiplier * rod_multiplier * luck_multiplier
+        self.xp_result_var.set(f"Adjusted XP: {adjusted:,.2f}")
+
+    def calculate_xp_needed(self) -> None:
+        try:
+            current = max(1, int(float(self.xp_current_level_var.get())))
+            target = max(1, int(float(self.xp_target_level_var.get())))
+        except ValueError:
+            self.xp_needed_result_var.set("XP needed: invalid level input")
+            return
+        needed = self._xp_between_levels(current, target)
+        self.xp_needed_result_var.set(f"XP needed: {needed:,}")
 
     def calculate_gold(self) -> None:
         location = self.gold_location_var.get()
@@ -1034,10 +1133,7 @@ class FischDesktopApp:
         rod_multiplier = self._rod_gold_bonus_multiplier(self.gold_rod_var.get())
         mutation_multiplier = self._expected_multiplier(self.gold_mutation_profile_var.get())
         adjusted = base_gold * enchant_multiplier * rod_multiplier * mutation_multiplier
-        self.gold_result_var.set(
-            "Adjusted Gold: "
-            f"{adjusted:,.2f}  (base {base_gold:,.2f} × rod {rod_multiplier:.3f} × enchant {enchant_multiplier:.3f} × mutation EV {mutation_multiplier:.3f})"
-        )
+        self.gold_result_var.set(f"Adjusted Gold: {adjusted:,.2f}")
 
     def _passive_stat_bonus(self, rod: dict[str, Any], stat: str) -> float:
         passive = (rod.get("passive") or "").lower()
