@@ -165,11 +165,14 @@ MUTATION_MULTIPLIERS = {
     "mythic": 2.25,
 }
 
-GOLD_ENCHANT_MULTIPLIERS = {
-    "None": 1.0,
-    "Greedy (+10%)": 1.10,
-    "Prosperous (+20%)": 1.20,
-    "Opulent (+35%)": 1.35,
+GOLD_ENCHANT_EFFECTS = {
+    "None": {"gold_multiplier": 1.0, "events": []},
+    "Greedy (+10% value)": {"gold_multiplier": 1.10, "events": []},
+    "Prosperous (+20% value)": {"gold_multiplier": 1.20, "events": []},
+    "Opulent (+35% value)": {"gold_multiplier": 1.35, "events": []},
+    "Aureate (20% for 4x)": {"gold_multiplier": 1.0, "events": [{"chance": 0.20, "multiplier": 4.0}]},
+    "Prismatic (10% for 8x)": {"gold_multiplier": 1.0, "events": [{"chance": 0.10, "multiplier": 8.0}]},
+    "Chaotic (5% for 12x)": {"gold_multiplier": 1.0, "events": [{"chance": 0.05, "multiplier": 12.0}]},
 }
 
 MUTATION_PROFILES = {
@@ -438,7 +441,7 @@ class FischDesktopApp:
         self.gold_enchant_combo = ttk.Combobox(
             frame,
             textvariable=self.gold_enchant_var,
-            values=list(GOLD_ENCHANT_MULTIPLIERS.keys()),
+            values=list(GOLD_ENCHANT_EFFECTS.keys()),
             state="normal",
             width=30,
         )
@@ -466,7 +469,7 @@ class FischDesktopApp:
         self.gold_mutation_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_gold())
         self._bind_filtering(self.gold_rod_combo, lambda: self._gold_rod_options, self.calculate_gold)
         self._bind_filtering(self.gold_location_combo, self.location_names, self.calculate_gold)
-        self._bind_filtering(self.gold_enchant_combo, list(GOLD_ENCHANT_MULTIPLIERS.keys()), self.calculate_gold)
+        self._bind_filtering(self.gold_enchant_combo, list(GOLD_ENCHANT_EFFECTS.keys()), self.calculate_gold)
         self._bind_filtering(self.gold_mutation_combo, list(MUTATION_PROFILES.keys()), self.calculate_gold)
         self.calculate_gold()
 
@@ -884,6 +887,19 @@ class FischDesktopApp:
         profile = MUTATION_PROFILES.get(profile_name, MUTATION_PROFILES["None"])
         return sum(entry["chance"] * entry["multiplier"] for entry in profile)
 
+    def _expected_multiplier_from_events(self, events: list[dict[str, float]]) -> float:
+        if not events:
+            return 1.0
+        total_chance = 0.0
+        weighted = 0.0
+        for event in events:
+            chance = max(0.0, float(event.get("chance", 0.0)))
+            multiplier = max(0.0, float(event.get("multiplier", 1.0)))
+            total_chance += chance
+            weighted += chance * multiplier
+        residual = max(0.0, 1.0 - total_chance)
+        return residual + weighted
+
     def _extract_percent_bonus(self, text: str, keywords: list[str]) -> float:
         if not text:
             return 0.0
@@ -925,19 +941,37 @@ class FischDesktopApp:
         if not text:
             return 1.0
         lowered = text.lower()
-        weighted_bonus = 0.0
-        total_chance = 0.0
+        events = self._parse_chance_multiplier_pairs(lowered)
         for mutation, multiplier in MUTATION_MULTIPLIERS.items():
             for match in re.finditer(rf"(\d+(?:\.\d+)?)\s*%[^.]*{re.escape(mutation)}", lowered):
-                chance = float(match.group(1)) / 100.0
-                if chance <= 0:
-                    continue
-                total_chance += chance
-                weighted_bonus += chance * multiplier
-        if total_chance <= 0:
-            return 1.0
-        residual = max(0.0, 1.0 - total_chance)
-        return residual + weighted_bonus
+                events.append({"chance": float(match.group(1)) / 100.0, "multiplier": multiplier})
+        return self._expected_multiplier_from_events(events)
+
+    def _parse_chance_multiplier_pairs(self, text: str) -> list[dict[str, float]]:
+        if not text:
+            return []
+        events: list[dict[str, float]] = []
+        lowered = text.lower()
+        for match in re.finditer(r"(\d+(?:\.\d+)?)\s*%[^.\n]{0,80}?(\d+(?:\.\d+)?)\s*x", lowered):
+            chance = float(match.group(1)) / 100.0
+            multiplier = float(match.group(2))
+            events.append({"chance": max(0.0, min(1.0, chance)), "multiplier": max(0.0, multiplier)})
+        for match in re.finditer(r"(\d+(?:\.\d+)?)\s*x[^.\n]{0,80}?(\d+(?:\.\d+)?)\s*%", lowered):
+            multiplier = float(match.group(1))
+            chance = float(match.group(2)) / 100.0
+            events.append({"chance": max(0.0, min(1.0, chance)), "multiplier": max(0.0, multiplier)})
+        for match in re.finditer(r"(\d+(?:\.\d+)?)\s*/\s*10[^.\n]{0,80}?(\d+(?:\.\d+)?)\s*x", lowered):
+            chance = float(match.group(1)) / 10.0
+            multiplier = float(match.group(2))
+            events.append({"chance": max(0.0, min(1.0, chance)), "multiplier": max(0.0, multiplier)})
+        return events
+
+    def _enchant_gold_multiplier(self, enchant_name: str) -> float:
+        effect = GOLD_ENCHANT_EFFECTS.get(enchant_name, {"gold_multiplier": 1.0, "events": []})
+        base = float(effect.get("gold_multiplier", 1.0))
+        events = list(effect.get("events", []))
+        events.extend(self._parse_chance_multiplier_pairs(enchant_name))
+        return base * self._expected_multiplier_from_events(events)
 
     def _rod_xp_bonus_multiplier(self, rod_name: str) -> float:
         if rod_name == "No xp bonus on rod":
@@ -996,7 +1030,7 @@ class FischDesktopApp:
     def calculate_gold(self) -> None:
         location = self.gold_location_var.get()
         base_gold = LOCATION_AVERAGES.get(location, {}).get("avg_gold", 0.0)
-        enchant_multiplier = GOLD_ENCHANT_MULTIPLIERS.get(self.gold_enchant_var.get(), 1.0)
+        enchant_multiplier = self._enchant_gold_multiplier(self.gold_enchant_var.get())
         rod_multiplier = self._rod_gold_bonus_multiplier(self.gold_rod_var.get())
         mutation_multiplier = self._expected_multiplier(self.gold_mutation_profile_var.get())
         adjusted = base_gold * enchant_multiplier * rod_multiplier * mutation_multiplier
