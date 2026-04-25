@@ -19,6 +19,8 @@ from typing import Any, Callable
 from rod_compare import DEFAULT_URL
 from wiki_index import DEFAULT_INDEX_FILE, load_index, refresh_index
 
+FISH_XP_FILE = Path(__file__).with_name("fish_xp_data.tsv")
+
 DISPLAY_COLUMNS = [
     "name",
     "lure_speed",
@@ -228,7 +230,9 @@ class FischDesktopApp:
 
         self.rods: list[dict[str, Any]] = []
         self.filtered_rods: list[dict[str, Any]] = []
-        self.location_names = sorted(LOCATION_AVERAGES.keys())
+        self.fish_xp_entries = self._load_fish_xp_entries()
+        self.fish_location_averages = self._build_location_xp_averages(self.fish_xp_entries)
+        self.location_names = sorted(set(LOCATION_AVERAGES.keys()) | set(self.fish_location_averages.keys()))
         self._xp_rod_options = ["No xp bonus on rod"]
         self._gold_rod_options: list[str] = []
 
@@ -382,6 +386,35 @@ class FischDesktopApp:
         self.context_menu.add_command(label="Add to compare", command=self.add_selected_row_to_compare)
         self._apply_theme()
 
+    def _load_fish_xp_entries(self) -> list[dict[str, Any]]:
+        entries: list[dict[str, Any]] = []
+        if not FISH_XP_FILE.exists():
+            return entries
+        for line in FISH_XP_FILE.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            parts = line.split("\t")
+            if len(parts) != 3:
+                continue
+            name, location, xp_text = parts
+            try:
+                xp_val = float(xp_text)
+            except ValueError:
+                continue
+            entries.append({"name": name.strip(), "location": location.strip(), "xp": xp_val})
+        return entries
+
+    def _build_location_xp_averages(self, entries: list[dict[str, Any]]) -> dict[str, float]:
+        buckets: dict[str, list[float]] = {}
+        for entry in entries:
+            location = (entry.get("location") or "").strip()
+            xp = float(entry.get("xp", 0.0))
+            if not location:
+                continue
+            buckets.setdefault(location, []).append(xp)
+        return {location: (sum(values) / len(values)) for location, values in buckets.items() if values}
+
     def _build_resource_tab(self, parent: ttk.Frame, mode: str) -> None:
         container = ttk.Frame(parent, padding=10)
         container.pack(fill="both", expand=True)
@@ -409,8 +442,10 @@ class FischDesktopApp:
         scrollbar.pack(side="right", fill="y")
 
         for location in self.location_names:
-            avg_key = "avg_xp" if mode == "xp" else "avg_gold"
-            avg_val = LOCATION_AVERAGES[location][avg_key]
+            if mode == "xp":
+                avg_val = self.fish_location_averages.get(location, LOCATION_AVERAGES.get(location, {}).get("avg_xp", 0.0))
+            else:
+                avg_val = LOCATION_AVERAGES.get(location, {}).get("avg_gold", 0.0)
             tree.insert("", "end", values=(location, f"{avg_val:,.2f}"))
 
         if mode == "xp":
@@ -1135,7 +1170,7 @@ class FischDesktopApp:
 
     def calculate_xp(self) -> None:
         location = self.xp_location_var.get()
-        base_xp = LOCATION_AVERAGES.get(location, {}).get("avg_xp", 0.0)
+        base_xp = self.fish_location_averages.get(location, LOCATION_AVERAGES.get(location, {}).get("avg_xp", 0.0))
         enchant_name = self.xp_enchant_var.get()
         enchant_multiplier = self._enchant_xp_multiplier(enchant_name)
         rod_multiplier = self._rod_xp_bonus_multiplier(self.xp_rod_var.get())
