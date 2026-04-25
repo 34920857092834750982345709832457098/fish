@@ -157,9 +157,38 @@ LOCATION_AVERAGES = {
 
 XP_ENCHANT_MULTIPLIERS = {
     "None": 1.0,
-    "Clever (+15%)": 1.15,
-    "Insight (+25%)": 1.25,
-    "Wise (+35%)": 1.35,
+    "Clever (2.25×)": 2.25,
+    "Insight (1.5×)": 1.5,
+    "Wise (1.2×)": 1.2,
+}
+
+LUCK_ENCHANT_BONUSES = {
+    "None": 0.0,
+    "Rage (-50%)": -50.0,
+    "Putrid (-10%)": -10.0,
+    "Quality (+20%)": 20.0,
+    "Lucky (+25%)": 25.0,
+    "Mystical (+25%)": 25.0,
+    "Breezed (+50%, outside Windy)": 50.0,
+    "Divine (+50%)": 50.0,
+    "Storming (+50%, outside Rain)": 50.0,
+    "Immortal (+75%)": 75.0,
+    "Breezed (+100%, during Windy)": 100.0,
+    "Storming (+100%, during Rain)": 100.0,
+}
+
+RARITY_BASE_ODDS = {
+    "Trash": 25.0,
+    "Common": 45.0,
+    "Uncommon": 14.0,
+    "Unusual": 7.0,
+    "Rare": 5.0,
+    "Legendary": 2.0,
+    "Mythical": 1.2,
+    "Exotic": 0.5,
+    "Secret": 0.2,
+    "Apex": 0.1,
+    "Unknown": 0.0,
 }
 
 ENCHANT_CATALOG = {
@@ -239,10 +268,21 @@ class FischDesktopApp:
         self.xp_location_var = tk.StringVar(value=self.location_names[0] if self.location_names else "")
         self.xp_rod_var = tk.StringVar(value="No xp bonus on rod")
         self.xp_enchant_var = tk.StringVar(value="None")
+        self.xp_luck_enchant_var = tk.StringVar(value="None")
+        self.xp_location_search_var = tk.StringVar(value="")
         self.xp_result_var = tk.StringVar(value="Adjusted XP: -")
+        self.xp_hour_result_var = tk.StringVar(value="XP/hour: -")
         self.xp_current_level_var = tk.StringVar(value="1")
         self.xp_target_level_var = tk.StringVar(value="2")
         self.xp_needed_result_var = tk.StringVar(value="XP needed: -")
+        self.xp_time_estimate_var = tk.StringVar(value="Time: -")
+        self.xp_base_lure_time_var = tk.StringVar(value="8")
+
+        self.xp_double_weekend_var = tk.BooleanVar(value=False)
+        self.xp_double_gamepass_var = tk.BooleanVar(value=False)
+        self.xp_moonkissed_var = tk.BooleanVar(value=False)
+        self.xp_perfect_catch_var = tk.BooleanVar(value=False)
+        self.xp_merlin_var = tk.BooleanVar(value=False)
 
         self.gold_location_var = tk.StringVar(value=self.location_names[0] if self.location_names else "")
         self.gold_rod_var = tk.StringVar(value="")
@@ -395,14 +435,18 @@ class FischDesktopApp:
             if not line or line.startswith("#"):
                 continue
             parts = line.split("\t")
-            if len(parts) != 3:
+            if len(parts) not in {3, 4}:
                 continue
-            name, location, xp_text = parts
+            if len(parts) == 3:
+                name, location, xp_text = parts
+                rarity = "Unknown"
+            else:
+                name, location, xp_text, rarity = parts
             try:
                 xp_val = float(xp_text)
             except ValueError:
                 continue
-            entries.append({"name": name.strip(), "location": location.strip(), "xp": xp_val})
+            entries.append({"name": name.strip(), "location": location.strip(), "xp": xp_val, "rarity": rarity.strip() or "Unknown"})
         return entries
 
     def _build_location_xp_averages(self, entries: list[dict[str, Any]]) -> dict[str, float]:
@@ -456,55 +500,98 @@ class FischDesktopApp:
             self._build_gold_calculator(calculator_frame)
 
     def _build_xp_calculator(self, frame: ttk.LabelFrame) -> None:
-        top_calc = ttk.LabelFrame(frame, text="XP per Catch Calculator", padding=14)
+        top_calc = ttk.LabelFrame(frame, text="Location Fish + XP Calculator", padding=14)
         top_calc.grid(row=0, column=0, sticky="nsew")
-        bottom_calc = ttk.LabelFrame(frame, text="XP Needed (Level Target)", padding=14)
+        bottom_calc = ttk.LabelFrame(frame, text="Level Progress Estimator", padding=14)
         bottom_calc.grid(row=1, column=0, sticky="nsew", pady=(16, 0))
 
-        ttk.Label(top_calc, text="Rod").grid(row=0, column=0, sticky="w", pady=6)
-        self.xp_rod_combo = ttk.Combobox(top_calc, textvariable=self.xp_rod_var, values=self._xp_rod_options, state="normal", width=34)
-        self.xp_rod_combo.grid(row=1, column=0, sticky="we", pady=(0, 10))
-        ttk.Label(top_calc, text="Location").grid(row=0, column=1, sticky="w", padx=(16, 0), pady=6)
-        self.xp_location_combo = ttk.Combobox(
-            top_calc, textvariable=self.xp_location_var, values=self.location_names, state="normal", width=34
-        )
-        self.xp_location_combo.grid(row=1, column=1, sticky="we", padx=(16, 0), pady=(0, 10))
+        ttk.Label(top_calc, text="Location search").grid(row=0, column=0, sticky="w", pady=4)
+        ttk.Entry(top_calc, textvariable=self.xp_location_search_var).grid(row=1, column=0, sticky="we", pady=(0, 8))
+        ttk.Label(top_calc, text="Location").grid(row=0, column=1, sticky="w", padx=(12, 0), pady=4)
+        self.xp_location_combo = ttk.Combobox(top_calc, textvariable=self.xp_location_var, values=self.location_names, state="normal", width=28)
+        self.xp_location_combo.grid(row=1, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
+        ttk.Label(top_calc, text="Rod").grid(row=0, column=2, sticky="w", padx=(12, 0), pady=4)
+        self.xp_rod_combo = ttk.Combobox(top_calc, textvariable=self.xp_rod_var, values=self._xp_rod_options, state="normal", width=28)
+        self.xp_rod_combo.grid(row=1, column=2, sticky="we", padx=(12, 0), pady=(0, 8))
 
-        ttk.Label(top_calc, text="Enchant").grid(row=2, column=0, sticky="w", pady=6)
-        self.xp_enchant_combo = ttk.Combobox(
-            top_calc, textvariable=self.xp_enchant_var, values=ENCHANT_OPTIONS, state="normal", width=34
+        ttk.Label(top_calc, text="XP enchant").grid(row=2, column=0, sticky="w", pady=4)
+        self.xp_enchant_combo = ttk.Combobox(top_calc, textvariable=self.xp_enchant_var, values=list(XP_ENCHANT_MULTIPLIERS.keys()), state="normal", width=28)
+        self.xp_enchant_combo.grid(row=3, column=0, sticky="we", pady=(0, 8))
+        ttk.Label(top_calc, text="Luck enchant").grid(row=2, column=1, sticky="w", padx=(12, 0), pady=4)
+        self.xp_luck_enchant_combo = ttk.Combobox(
+            top_calc, textvariable=self.xp_luck_enchant_var, values=list(LUCK_ENCHANT_BONUSES.keys()), state="normal", width=28
         )
-        self.xp_enchant_combo.grid(row=3, column=0, sticky="we", pady=(0, 10))
-        ttk.Button(top_calc, text="Calculate XP", command=self.calculate_xp).grid(row=3, column=1, sticky="we", padx=(16, 0), pady=(0, 10))
-        ttk.Label(top_calc, textvariable=self.xp_result_var, font=("TkDefaultFont", 12, "bold")).grid(
-            row=4, column=0, columnspan=2, sticky="w", pady=(10, 0)
+        self.xp_luck_enchant_combo.grid(row=3, column=1, sticky="we", padx=(12, 0), pady=(0, 8))
+        ttk.Label(top_calc, text="Base lure time (s)").grid(row=2, column=2, sticky="w", padx=(12, 0), pady=4)
+        ttk.Entry(top_calc, textvariable=self.xp_base_lure_time_var, width=12).grid(row=3, column=2, sticky="w", padx=(12, 0), pady=(0, 8))
+
+        boosts = ttk.Frame(top_calc)
+        boosts.grid(row=4, column=0, columnspan=3, sticky="we", pady=(2, 8))
+        ttk.Checkbutton(boosts, text="Double XP Weekend/Week (2×)", variable=self.xp_double_weekend_var).grid(row=0, column=0, sticky="w")
+        ttk.Checkbutton(boosts, text="Double XP Gamepass (2×)", variable=self.xp_double_gamepass_var).grid(row=0, column=1, sticky="w", padx=(12, 0))
+        ttk.Checkbutton(boosts, text="Moon-Kissed Buff (1.5×)", variable=self.xp_moonkissed_var).grid(row=1, column=0, sticky="w")
+        ttk.Checkbutton(boosts, text="Perfect Catches", variable=self.xp_perfect_catch_var).grid(row=1, column=1, sticky="w", padx=(12, 0))
+        ttk.Checkbutton(boosts, text="Merlin XP Boost (1.2×)", variable=self.xp_merlin_var).grid(row=2, column=0, sticky="w")
+
+        ttk.Button(top_calc, text="Calculate XP", command=self.calculate_xp).grid(row=5, column=0, sticky="we", pady=(0, 6))
+        ttk.Label(top_calc, textvariable=self.xp_result_var, font=("TkDefaultFont", 12, "bold")).grid(row=5, column=1, columnspan=2, sticky="w", padx=(12, 0))
+        ttk.Label(top_calc, textvariable=self.xp_hour_result_var, font=("TkDefaultFont", 11, "bold")).grid(
+            row=6, column=0, columnspan=3, sticky="w", pady=(0, 6)
         )
+
+        fish_cols = ("fish", "rarity", "xp", "adjusted_xp", "odds")
+        self.xp_fish_tree = ttk.Treeview(top_calc, columns=fish_cols, show="headings", height=11)
+        self.xp_fish_tree.heading("fish", text="Fish")
+        self.xp_fish_tree.heading("rarity", text="Rarity")
+        self.xp_fish_tree.heading("xp", text="Base XP")
+        self.xp_fish_tree.heading("adjusted_xp", text="Adjusted XP")
+        self.xp_fish_tree.heading("odds", text="Odds /100")
+        for col, width in [("fish", 180), ("rarity", 90), ("xp", 80), ("adjusted_xp", 100), ("odds", 90)]:
+            self.xp_fish_tree.column(col, width=width, anchor="w")
+        self.xp_fish_tree.grid(row=7, column=0, columnspan=3, sticky="nsew", pady=(8, 0))
 
         ttk.Label(bottom_calc, text="Current level").grid(row=0, column=0, sticky="w", pady=6)
         ttk.Entry(bottom_calc, textvariable=self.xp_current_level_var, width=16).grid(row=1, column=0, sticky="w", pady=(0, 10))
         ttk.Label(bottom_calc, text="Desired level").grid(row=0, column=1, sticky="w", padx=(16, 0), pady=6)
         ttk.Entry(bottom_calc, textvariable=self.xp_target_level_var, width=16).grid(row=1, column=1, sticky="w", padx=(16, 0), pady=(0, 10))
-        ttk.Button(bottom_calc, text="Calculate XP Needed", command=self.calculate_xp_needed).grid(
+        ttk.Button(bottom_calc, text="Calculate Required XP + Time", command=self.calculate_xp_needed).grid(
             row=2, column=0, columnspan=2, sticky="we", pady=(0, 8)
         )
-        ttk.Label(bottom_calc, textvariable=self.xp_needed_result_var, font=("TkDefaultFont", 12, "bold")).grid(
-            row=3, column=0, columnspan=2, sticky="w", pady=(8, 0)
+        ttk.Label(bottom_calc, textvariable=self.xp_needed_result_var, font=("TkDefaultFont", 12, "bold")).grid(row=3, column=0, sticky="w")
+        ttk.Label(bottom_calc, textvariable=self.xp_time_estimate_var, font=("TkDefaultFont", 12, "bold")).grid(
+            row=3, column=1, sticky="w", padx=(16, 0)
         )
 
         frame.columnconfigure(0, weight=1)
         frame.rowconfigure(0, weight=1)
         top_calc.columnconfigure(0, weight=1)
         top_calc.columnconfigure(1, weight=1)
+        top_calc.columnconfigure(2, weight=1)
+        top_calc.rowconfigure(7, weight=1)
         bottom_calc.columnconfigure(0, weight=1)
         bottom_calc.columnconfigure(1, weight=1)
+
         self.xp_location_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
         self.xp_rod_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
         self.xp_enchant_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
+        self.xp_luck_enchant_combo.bind("<<ComboboxSelected>>", lambda *_: self.calculate_xp())
         self._bind_filtering(self.xp_rod_combo, lambda: self._xp_rod_options, self.calculate_xp)
-        self._bind_filtering(self.xp_location_combo, self.location_names, self.calculate_xp)
-        self._bind_filtering(self.xp_enchant_combo, ENCHANT_OPTIONS, self.calculate_xp)
+        self._bind_filtering(self.xp_location_combo, lambda: self._filtered_locations(), self.calculate_xp)
+        self._bind_filtering(self.xp_enchant_combo, list(XP_ENCHANT_MULTIPLIERS.keys()), self.calculate_xp)
+        self._bind_filtering(self.xp_luck_enchant_combo, list(LUCK_ENCHANT_BONUSES.keys()), self.calculate_xp)
+
+        self.xp_location_search_var.trace_add("write", lambda *_: self._on_xp_location_search())
+        for var in [
+            self.xp_double_weekend_var,
+            self.xp_double_gamepass_var,
+            self.xp_moonkissed_var,
+            self.xp_perfect_catch_var,
+            self.xp_merlin_var,
+        ]:
+            var.trace_add("write", lambda *_: self.calculate_xp())
         self.xp_current_level_var.trace_add("write", lambda *_: self.calculate_xp_needed())
         self.xp_target_level_var.trace_add("write", lambda *_: self.calculate_xp_needed())
+        self.xp_base_lure_time_var.trace_add("write", lambda *_: self.calculate_xp())
         self.calculate_xp()
         self.calculate_xp_needed()
 
@@ -977,6 +1064,20 @@ class FischDesktopApp:
         combo.bind("<Button-1>", filter_values)
         combo.bind("<FocusOut>", lambda *_: on_change())
 
+    def _filtered_locations(self) -> list[str]:
+        query = self.xp_location_search_var.get().strip().lower()
+        if not query:
+            return self.location_names
+        return [loc for loc in self.location_names if query in loc.lower()]
+
+    def _on_xp_location_search(self) -> None:
+        filtered = self._filtered_locations()
+        if hasattr(self, "xp_location_combo"):
+            self.xp_location_combo["values"] = filtered
+            if self.xp_location_var.get() not in filtered and filtered:
+                self.xp_location_var.set(filtered[0])
+        self.calculate_xp()
+
     def _sort_average_tree(self, mode: str) -> None:
         tree = self.xp_locations_tree if mode == "xp" else self.gold_locations_tree
         rows = []
@@ -1089,6 +1190,8 @@ class FischDesktopApp:
         return base * self._expected_multiplier_from_events(events)
 
     def _enchant_luck_bonus(self, enchant_name: str) -> float:
+        if enchant_name in LUCK_ENCHANT_BONUSES:
+            return float(LUCK_ENCHANT_BONUSES[enchant_name])
         return float(ENCHANT_CATALOG.get(enchant_name, {}).get("luck", 0.0))
 
     def _enchant_xp_multiplier(self, enchant_name: str) -> float:
@@ -1111,6 +1214,30 @@ class FischDesktopApp:
             return 1.0
         weighted = ((low_scaled * low_xp) + (high_scaled * high_xp)) / norm
         return weighted / baseline
+
+    def _location_fish(self, location: str) -> list[dict[str, Any]]:
+        return [entry for entry in self.fish_xp_entries if entry.get("location") == location]
+
+    def _fish_odds_for_location(self, location: str, luck_percent: float) -> list[tuple[dict[str, Any], float]]:
+        fish = self._location_fish(location)
+        if not fish:
+            return []
+        weighted: list[tuple[dict[str, Any], float]] = []
+        for entry in fish:
+            rarity = (entry.get("rarity") or "Unknown").title()
+            base = RARITY_BASE_ODDS.get(rarity, RARITY_BASE_ODDS["Unknown"])
+            if base <= 0:
+                base = 1.0
+            adjusted = base
+            if luck_percent > 0:
+                high_tier = rarity in {"Legendary", "Mythical", "Exotic", "Secret", "Apex"} or base < 5.0
+                if high_tier:
+                    adjusted *= 1.0 + (luck_percent / 100.0)
+                else:
+                    adjusted *= max(0.0, 1.0 - (luck_percent / 1000.0))
+            weighted.append((entry, max(0.0, adjusted)))
+        total = sum(weight for _, weight in weighted) or 1.0
+        return [(entry, (weight / total) * 100.0) for entry, weight in weighted]
 
     def _xp_between_levels(self, current_level: int, desired_level: int) -> int:
         if desired_level <= current_level:
@@ -1172,13 +1299,63 @@ class FischDesktopApp:
         location = self.xp_location_var.get()
         base_xp = self.fish_location_averages.get(location, LOCATION_AVERAGES.get(location, {}).get("avg_xp", 0.0))
         enchant_name = self.xp_enchant_var.get()
-        enchant_multiplier = self._enchant_xp_multiplier(enchant_name)
+        enchant_multiplier = XP_ENCHANT_MULTIPLIERS.get(enchant_name, self._enchant_xp_multiplier(enchant_name))
         rod_multiplier = self._rod_xp_bonus_multiplier(self.xp_rod_var.get())
         rod = self._find_rod(self.xp_rod_var.get()) if self.xp_rod_var.get() != "No xp bonus on rod" else None
         rod_luck = self._num((rod or {}).get("luck"))
-        luck_multiplier = self._luck_xp_multiplier(rod_luck + self._enchant_luck_bonus(enchant_name))
-        adjusted = base_xp * enchant_multiplier * rod_multiplier * luck_multiplier
-        self.xp_result_var.set(f"Adjusted XP: {adjusted:,.2f}")
+        total_luck = rod_luck + self._enchant_luck_bonus(self.xp_luck_enchant_var.get())
+
+        misc_multiplier = 1.0
+        if self.xp_double_weekend_var.get():
+            misc_multiplier *= 2.0
+        if self.xp_double_gamepass_var.get():
+            misc_multiplier *= 2.0
+        if self.xp_moonkissed_var.get():
+            misc_multiplier *= 1.5
+        if self.xp_merlin_var.get():
+            misc_multiplier *= 1.2
+        if self.xp_perfect_catch_var.get():
+            is_pinion = "pinion" in ((rod or {}).get("name", "").lower()) and "aria" in ((rod or {}).get("name", "").lower())
+            misc_multiplier *= 2.42 if is_pinion else 1.5
+
+        fish_odds = self._fish_odds_for_location(location, total_luck)
+        if fish_odds:
+            avg_xp = 0.0
+            for item in self.xp_fish_tree.get_children():
+                self.xp_fish_tree.delete(item)
+            for entry, odds in fish_odds:
+                adjusted_fish_xp = float(entry["xp"]) * enchant_multiplier * misc_multiplier * rod_multiplier
+                avg_xp += adjusted_fish_xp * (odds / 100.0)
+                self.xp_fish_tree.insert(
+                    "",
+                    "end",
+                    values=(
+                        entry["name"],
+                        entry.get("rarity", "Unknown"),
+                        f"{float(entry['xp']):,.2f}",
+                        f"{adjusted_fish_xp:,.2f}",
+                        f"{odds:.2f}/100",
+                    ),
+                )
+        else:
+            avg_xp = base_xp * enchant_multiplier * misc_multiplier * rod_multiplier * self._luck_xp_multiplier(total_luck)
+            if hasattr(self, "xp_fish_tree"):
+                for item in self.xp_fish_tree.get_children():
+                    self.xp_fish_tree.delete(item)
+
+        lure_speed = self._num((rod or {}).get("lure_speed"))
+        lure_speed += self._extract_percent_bonus(self.xp_enchant_var.get(), ["lure"])
+        try:
+            base_lure = max(0.1, float(self.xp_base_lure_time_var.get()))
+        except ValueError:
+            base_lure = 8.0
+        lure_seconds = max(0.1, base_lure * (1.0 - (lure_speed / 100.0)))
+        seconds_per_fish = 15.0 + lure_seconds
+        xp_per_hour = avg_xp * (3600.0 / seconds_per_fish)
+
+        self.xp_result_var.set(f"Adjusted XP: {avg_xp:,.2f}")
+        self.xp_hour_result_var.set(f"XP/hour: {xp_per_hour:,.2f}  |  Avg seconds/fish: {seconds_per_fish:.2f}")
+        self.calculate_xp_needed()
 
     def calculate_xp_needed(self) -> None:
         try:
@@ -1195,6 +1372,17 @@ class FischDesktopApp:
             self.xp_target_level_var.set("2000")
         needed = self._xp_between_levels(current, target)
         self.xp_needed_result_var.set(f"XP needed: {needed:,}")
+        xp_hour = 0.0
+        match = re.search(r"XP/hour:\s*([0-9,]+(?:\.\d+)?)", self.xp_hour_result_var.get())
+        if match:
+            xp_hour = float(match.group(1).replace(",", ""))
+        if xp_hour > 0:
+            hours_total = needed / xp_hour
+            hours = int(hours_total)
+            minutes = int((hours_total - hours) * 60)
+            self.xp_time_estimate_var.set(f"Time: {hours}h {minutes}m")
+        else:
+            self.xp_time_estimate_var.set("Time: -")
 
     def calculate_gold(self) -> None:
         location = self.gold_location_var.get()
